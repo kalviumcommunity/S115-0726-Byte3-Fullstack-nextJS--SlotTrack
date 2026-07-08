@@ -72,6 +72,46 @@ Members should be able to view their attendance and booking history with paginat
 | Deployment      | Google Cloud Platform                   |
 | Version Control | Git & GitHub                            |
 
+
+   ---
+
+## Technical Requirements
+
+SlotTrack is designed around the following technical requirements:
+
+- Responsive and user-friendly web application
+- Secure authentication with role-based access control
+- RESTful architecture for scalable backend services
+- Transaction-safe booking operations to prevent overbooking
+- Real-time seat availability synchronization
+- Modular and maintainable codebase
+- Efficient database design supporting concurrent users
+- Paginated booking and attendance history
+
+---
+
+## Non-Functional Requirements
+
+### Performance
+
+- Fast booking and cancellation operations
+- Support for concurrent booking requests
+- Efficient pagination for booking history
+
+### Security
+
+- Secure authentication and authorization
+- Protected routes based on user roles
+- Input validation and secure handling of user data
+
+### Scalability
+
+- Modular application architecture
+- Extensible backend services
+- Database optimized for future feature expansion
+
+---
+
 ---
 
 ## High-Level Booking Flow
