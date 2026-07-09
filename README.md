@@ -271,6 +271,13 @@ slottrack/
 > The project structure may change as development progresses.
 
 ---
+## Design System:
+
+## Font palette
+- Heading : Space Grostesk | 42 - Bold 
+- SubHeading : Manrope | 24 - Semi-Bold
+- Body : Manrope |  16 - Regular
+
 
 ## Getting Started
 
