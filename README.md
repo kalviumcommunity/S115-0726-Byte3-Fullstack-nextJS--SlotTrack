@@ -422,6 +422,18 @@ Detailed product requirements and project planning can be found in the project d
 * Additional technical documentation will be added as development progresses.
 
 ---
+## RoadMap
+
+| Date | Progress |
+|------|----------|
+| **7 July 2026** | - Understood and analyzed the Cure.fit class booking problem statement.<br>- Finalized the project scope and core requirements.<br>- Set up the GitHub repository, initialized the project, and configured the team development workflow. |
+| **8 July 2026** | - Created the **Product Requirements Document (PRD)**.<br>- Prepared the **Technical Requirements Document (TRD)**.<br>- Completed the project scaffolding, including folder structure, initial configuration, and technology setup. |
+| **9 July 2026** | - Designed the complete **high-fidelity UI** in Figma.<br>- Finalized the system design for both Member and Admin workflows.<br>- Created responsive dashboard and booking interface designs to serve as the implementation blueprint. |
+
+---
+
+
+---
 
 ## License
 
