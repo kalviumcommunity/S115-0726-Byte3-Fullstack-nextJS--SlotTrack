@@ -273,10 +273,18 @@ slottrack/
 ---
 ## Design System:
 
-## Font palette
+### Font palette
 - Heading : Space Grostesk | 42 - Bold 
 - SubHeading : Manrope | 24 - Semi-Bold
 - Body : Manrope |  16 - Regular
+
+### Colour palette
+-Primary-BG: #DCDCDC
+-Primary-Text: #000000
+-Accent : #72BF6A 
+-Secondary-BG : #E8E8E8
+
+---
 
 
 ## Getting Started
