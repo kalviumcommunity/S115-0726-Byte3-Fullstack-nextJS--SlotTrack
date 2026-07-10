@@ -90,6 +90,100 @@ SlotTrack is designed around the following technical requirements:
 
 ---
 
+## Pages and Features
+### 2. Class Booking Page
+
+The Class Booking Page displays detailed information about a selected fitness class and allows members to reserve a seat.
+
+#### Class Details
+- Class name and category.
+- Class image.
+- Date and time.
+- Studio or class location.
+- Instructor name.
+- Current booked seats and total capacity.
+- Live seat availability.
+
+#### Booking Features
+- View the number of seats currently available.
+- Book a seat in the selected class.
+- Seat availability updates after a successful booking.
+- Prevent booking when the class reaches maximum capacity.
+- Receive booking confirmation.
+
+#### About the Class
+- Description of the fitness class.
+- Class duration.
+- Intensity level.
+- Equipment requirements.
+- Maximum participant capacity.
+
+#### About the Instructor
+- Instructor name and profile image.
+- Instructor specialization.
+- Short instructor description.
+- Certification information.
+- Years of experience.
+
+---
+### 3. User Profile and Attendance History
+
+The User Profile page allows members to view their fitness activity and previous class attendance.
+
+#### Profile Information
+- Member name and profile details.
+- Basic account information.
+
+#### Attendance Overview
+- Visual representation of class attendance and fitness activity.
+- Track attendance trends over time.
+
+#### Attendance History
+- View previously attended fitness classes.
+- Display class name, date, instructor, and attendance status.
+- Navigate through attendance records using pagination.
+- View older and newer attendance records.
+
+---
+
+### 4. Instructor Dashboard
+
+The Instructor Dashboard allows instructors to manage fitness classes and monitor class bookings.
+
+#### Schedule
+- View classes created by the instructor.
+- Display upcoming classes.
+- View class timings.
+- View booked seats and total class capacity.
+- Create a new fitness class.
+
+#### Class History
+- View previously created classes.
+- Display class name, date, and time.
+- View class capacity.
+- View the number of booked seats.
+- Access class management actions.
+- Navigate through class records using pagination.
+
+#### Class Management
+- Create new fitness classes.
+- Monitor live booking counts.
+- View class capacity.
+- Manage existing classes.
+
+---
+
+## Core System Features
+
+- Real-time seat availability.
+- Race-condition-safe class booking.
+- Seat count decreases when a booking is confirmed.
+- Cancelled bookings reopen seats.
+- Prevention of overbooking.
+- Paginated attendance history.
+- Separate member and instructor interfaces.
+- Responsive and consistent user interface.
+
 ## Non-Functional Requirements
 
 ### Performance
