@@ -91,6 +91,19 @@ SlotTrack is designed around the following technical requirements:
 ---
 
 ## Pages and Features
+### 1. User Dashboard
+
+The User Dashboard allows members to discover available fitness classes and manage their upcoming schedule.
+
+#### Features
+- View available fitness classes.
+- Display class name, instructor, date, and time.
+- View live seat availability for each class.
+- Navigate to the booking page by selecting a class.
+- View upcoming booked classes in the Schedule section.
+- Access the user profile.
+
+---
 ### 2. Class Booking Page
 
 The Class Booking Page displays detailed information about a selected fitness class and allows members to reserve a seat.
