@@ -1,3 +1,5 @@
-export interface ApiResponse<T = any> {
-  // TODO: Define generic API response envelope properties.
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }

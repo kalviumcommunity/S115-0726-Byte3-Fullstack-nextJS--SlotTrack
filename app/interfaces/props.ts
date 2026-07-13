@@ -1,3 +1,6 @@
-export interface ComponentProps {
-  // TODO: Define common reusable component properties.
+import React from "react";
+
+export interface BaseProps {
+  className?: string;
+  children?: React.ReactNode;
 }

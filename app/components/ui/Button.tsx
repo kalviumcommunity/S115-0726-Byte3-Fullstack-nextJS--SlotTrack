@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "@/app/lib/utils";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "danger" | "ghost";
@@ -11,29 +12,29 @@ export default function Button({
   variant = "primary",
   size = "md",
   isLoading = false,
-  className = "",
+  className,
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center font-semibold rounded-[14px] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100";
+  const baseStyles = "inline-flex items-center justify-center font-semibold font-manrope rounded-button transition-all duration-300 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 cursor-pointer";
   
   const variants = {
-    primary: "bg-[#72BF6A] text-white hover:bg-[#61a859] hover:shadow-[0_4px_12px_rgba(114,191,106,0.3)] shadow-[0_2px_8px_rgba(114,191,106,0.15)]",
-    secondary: "bg-[#EEF2F6] text-[#111827] hover:bg-[#e2e8f0]",
-    outline: "border-2 border-[#E5E7EB] bg-white text-[#111827] hover:border-[#72BF6A] hover:text-[#72BF6A]",
-    danger: "bg-[#EF4444] text-white hover:bg-[#dc2626] hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]",
-    ghost: "bg-transparent text-[#6B7280] hover:bg-[#EEF2F6] hover:text-[#111827]"
+    primary: "bg-primary text-[#111827] hover:bg-primary-hover hover:shadow-[0_4px_12px_rgba(114,191,106,0.25)] shadow-[0_2px_8px_rgba(114,191,106,0.12)]",
+    secondary: "bg-surface border border-border text-text-primary hover:bg-bg-base",
+    danger: "bg-danger text-white hover:bg-red-600 hover:shadow-[0_4px_12px_rgba(239,68,68,0.25)]",
+    outline: "border border-border bg-transparent text-text-primary hover:bg-bg-base",
+    ghost: "bg-transparent text-text-secondary hover:bg-bg-base hover:text-text-primary"
   };
 
   const sizes = {
-    sm: "px-4 py-2 text-sm",
-    md: "px-5 py-3 text-base",
-    lg: "px-6 py-4 text-lg"
+    sm: "h-9 px-4 text-sm",
+    md: "h-11 px-5 text-base",
+    lg: "h-12 px-6 text-lg",
   };
 
   return (
     <button
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={cn(baseStyles, variants[variant], sizes[size], className)}
       disabled={disabled || isLoading}
       {...props}
     >

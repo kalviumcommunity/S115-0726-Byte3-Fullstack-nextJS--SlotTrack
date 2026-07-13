@@ -1,3 +1,12 @@
 export interface FitnessClass {
-  // TODO: Define FitnessClass properties (id, title, instructor, startTime, endTime, capacity, availableSeats, etc.).
+  id: string;
+  title: string;
+  instructor: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  date: string;
+  capacity: number;
+  availableSeats: number;
+  category: string;
 }
