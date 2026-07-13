@@ -1,3 +1,7 @@
 export interface Booking {
-  // TODO: Define Booking properties (id, userId, classId, status, createdAt, etc.).
+  id: string;
+  userId: string;
+  classId: string;
+  status: string;
+  createdAt: string;
 }

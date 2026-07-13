@@ -1,4 +1,6 @@
 import React from "react";
+import Link from "next/link";
+import { Dumbbell } from "lucide-react";
 
 export default function Logo() {
   return (
