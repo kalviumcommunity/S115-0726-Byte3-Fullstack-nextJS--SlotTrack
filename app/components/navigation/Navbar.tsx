@@ -1,20 +1,31 @@
+"use client";
+
 import React from "react";
 import Logo from "./Logo";
 import LocationSelector from "./LocationSelector";
 import ProfileDropdown from "./ProfileDropdown";
 
-export default function Navbar() {
+export interface NavbarProps {
+  onProfileClick?: () => void;
+}
+
+export default function Navbar({ onProfileClick = () => {} }: NavbarProps) {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-surface/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-6">
+    <header className="fixed top-0 left-0 w-full h-[90px] md:h-[100px] bg-surface/90 backdrop-blur-md border-b border-border z-40 transition-all duration-300">
+      <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
+        {/* Left Section: Logo */}
+        <div className="flex items-center">
           <Logo />
         </div>
+
+        {/* Center Section: Location selector (centered) */}
         <div className="flex items-center justify-center flex-1">
           <LocationSelector />
         </div>
+
+        {/* Right Section: ProfileDropdown */}
         <div className="flex items-center gap-4">
-          <ProfileDropdown />
+          <ProfileDropdown onProfileClick={onProfileClick} />
         </div>
       </div>
     </header>

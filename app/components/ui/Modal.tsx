@@ -1,4 +1,6 @@
-import React, { useEffect } from "react";
+"use client";
+
+import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 
@@ -11,6 +13,8 @@ export interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -27,11 +31,21 @@ export default function Modal({ isOpen, onClose, title, children, className }: M
 
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity duration-300">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in"
+      onClick={handleBackdropClick}
+    >
       <div
+        ref={modalRef}
         className={cn(
-          "relative w-full max-w-lg bg-surface rounded-modal shadow-card border border-border flex flex-col max-h-[90vh] overflow-hidden",
+          "relative w-full max-w-lg bg-surface rounded-modal shadow-card border border-border flex flex-col max-h-[90vh] overflow-hidden animate-scale-up",
           className
         )}
       >

@@ -9,8 +9,10 @@ export default function Card({ children, hoverable = false, className, ...props 
   return (
     <div
       className={cn(
-        "bg-surface rounded-card shadow-card border border-border p-6",
-        hoverable && "transition-shadow hover:shadow-card-hover",
+        "bg-surface rounded-card border border-border p-6 transition-all duration-300",
+        hoverable
+          ? "hover:translate-y-[-4px] hover:shadow-card-hover shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+          : "shadow-card",
         className
       )}
       {...props}
