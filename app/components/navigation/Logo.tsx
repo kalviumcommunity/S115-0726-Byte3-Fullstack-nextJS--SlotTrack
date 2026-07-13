@@ -4,11 +4,18 @@ import { Dumbbell } from "lucide-react";
 
 export default function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2 font-sora font-bold text-xl text-[#111827] cursor-pointer">
-      <div className="flex items-center justify-center size-9 rounded-xl bg-primary text-[#111827]">
-        <Dumbbell className="size-5" />
-      </div>
-      <span>SlotTrack</span>
-    </Link>
+    <div className="flex items-center gap-3.5 flex-shrink-0 cursor-pointer">
+      <img
+        src="/cure-fit-logo-removebg-preview 1.png"
+        alt="Cure.fit Logo"
+        className="h-6 md:h-7 w-auto object-contain"
+      />
+      <div className="h-6 w-px bg-gray-200"></div>
+      <img
+        src="/slottrack-logo-removebg-preview 1 (1).png"
+        alt="SlotTrack Logo"
+        className="h-8 md:h-9 w-auto object-contain"
+      />
+    </div>
   );
 }

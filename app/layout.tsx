@@ -15,8 +15,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "SlotTrack - cure.fit Class Booking System",
-  description: "Manage and book your fitness classes in real-time.",
+  title: "SlotTrack - Booking Page",
+  description: "Cure.fit Fitness Class Booking System",
 };
 
 export default function RootLayout({
