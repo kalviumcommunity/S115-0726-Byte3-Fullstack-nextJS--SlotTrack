@@ -1,3 +1,7 @@
 export interface User {
-  // TODO: Define User properties (id, name, email, password, role, etc.).
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "member";
+  createdAt: string;
 }

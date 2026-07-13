@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC;
+  --foreground: #111827;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@theme {
+  --color-primary: #63C15B;
+  --color-primary-hover: #52A34B;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --color-bg-base: #F8FAFC;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sora: var(--font-sora);
+  --font-manrope: var(--font-manrope);
+
+  --shadow-card: 0px 8px 30px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0px 12px 40px rgba(0, 0, 0, 0.12);
+
+  --radius-card: 20px;
+  --radius-button: 14px;
+  --radius-input: 12px;
+  --radius-modal: 24px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-manrope), sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sora), sans-serif;
 }

@@ -1,3 +1,7 @@
+import { FitnessClass } from "./class";
+
 export interface Schedule {
-  // TODO: Define Schedule properties (id, date, startTime, endTime, status, etc.).
+  id: string;
+  date: string;
+  items: FitnessClass[];
 }
