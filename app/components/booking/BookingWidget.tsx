@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, Calendar, Loader2 } from "lucide-react";
-import Button from "../ui/Button";
+import { User, Calendar } from "lucide-react";
 
 export interface BookingWidgetProps {
   classId?: string;
@@ -24,7 +23,6 @@ export default function BookingWidget({
   isLoading = false,
 }: BookingWidgetProps) {
   const [internalLoading, setInternalLoading] = useState(false);
-  const occupancyPercentage = ((capacity - availableSeats) / capacity) * 100;
 
   const handleBookClick = () => {
     if (!onBook) return;
@@ -38,63 +36,53 @@ export default function BookingWidget({
   const activeLoading = isLoading || internalLoading;
 
   return (
-    <div className="w-full rounded-[24px] border border-gray-100 bg-white p-6 shadow-card max-w-[420px] mx-auto md:mr-0 space-y-6">
-      <h3 className="text-center font-display text-base font-bold text-text-primary border-b border-gray-50 pb-2">
-        Class Booking
+    <div className="w-full rounded-2xl border border-gray-200 bg-white p-6 max-w-[360px] mx-auto md:mr-0 space-y-5">
+      {/* Header */}
+      <h3 className="text-center font-manrope text-base font-bold text-[#111827]">
+        Book now
       </h3>
 
-      {/* Available Seats Block & Progress Bar */}
-      <div className="space-y-3">
-        <div className="flex justify-between items-baseline">
-          <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-            Occupancy Status
+      {/* Available Seats */}
+      <div className="space-y-1">
+        <span className="text-xs text-gray-500 block">Available Seats</span>
+        <div className="flex items-center gap-1.5">
+          <User className="h-4 w-4 text-[#72BF6A]" />
+          <span className="text-2xl font-extrabold text-[#72BF6A]">
+            {availableSeats}/{capacity}
           </span>
-          <div className="flex items-center gap-1.5 text-lg font-black text-primary">
-            <User className="h-4 w-4 stroke-[3]" />
-            <span>{availableSeats} left of {capacity}</span>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full bg-[#EEF2F6] h-2.5 rounded-full overflow-hidden">
-          <div
-            className={`h-full transition-all duration-500 rounded-full ${
-              availableSeats <= 5 ? "bg-red-500" : "bg-[#72BF6A]"
-            }`}
-            style={{ width: `${Math.min(100, Math.max(0, 100 - occupancyPercentage))}%` }}
-          />
         </div>
       </div>
 
-      {/* Pricing block */}
-      <div className="text-center bg-gray-50/50 py-3.5 rounded-[16px] border border-gray-100">
-        <span className="text-xs font-bold text-text-secondary block mb-1 uppercase tracking-wider">
-          Total Fee
-        </span>
-        <span className="text-3xl font-extrabold text-[#111827] tracking-tight">
+      {/* Price */}
+      <div className="space-y-0.5">
+        <span className="text-xs text-gray-500 block">Total</span>
+        <span className="text-2xl font-extrabold text-[#111827]">
           ₹ {price.toFixed(2)}
         </span>
       </div>
 
-      {/* Actions */}
-      <div className="space-y-3">
-        <Button
-          variant={isBooked ? "outline" : "primary"}
-          className="w-full font-bold py-3.5 text-sm"
-          isLoading={activeLoading}
-          onClick={handleBookClick}
-          disabled={availableSeats <= 0 && !isBooked}
-        >
-          {isBooked ? "Cancel Booking" : availableSeats <= 0 ? "Class Full" : "Reserve A Seat"}
-        </Button>
+      {/* Confirm Booking Button */}
+      <button
+        onClick={handleBookClick}
+        disabled={(availableSeats <= 0 && !isBooked) || activeLoading}
+        className="w-full rounded-xl bg-[#72BF6A] py-3 text-sm font-bold text-white hover:bg-[#5eaa57] transition-colors active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+      >
+        {activeLoading ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Processing...
+          </span>
+        ) : isBooked ? "Cancel Booking" : availableSeats <= 0 ? "Class Full" : "Confirm Booking"}
+      </button>
 
-        <button
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-3.5 text-sm font-bold text-text-primary shadow-[0px_2px_4px_rgba(0,0,0,0.01)] transition-colors hover:bg-gray-50 active:scale-[0.98] cursor-pointer"
-        >
-          <Calendar className="h-4 w-4 text-text-primary" />
-          <span>Add to Calendar</span>
-        </button>
-      </div>
+      {/* Add to Calendar */}
+      <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-2.5 text-sm font-semibold text-[#111827] hover:bg-gray-50 transition-colors active:scale-[0.98] cursor-pointer">
+        <Calendar className="h-4 w-4 text-gray-500" />
+        <span>Add to Calendar</span>
+      </button>
     </div>
   );
 }
