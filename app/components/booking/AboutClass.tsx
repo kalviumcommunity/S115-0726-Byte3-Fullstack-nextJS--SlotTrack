@@ -28,23 +28,23 @@ export default function AboutClass({
             {/* Grid of details */}
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 border-t border-gray-100 pt-6">
                 <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                    <span className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Duration</span>
-                    <span className="text-sm font-bold text-text-primary">{duration}</span>
+                    <span className="font-manrope text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#72BF6A' }}>Duration</span>
+                    <span className="font-manrope text-sm font-bold text-text-primary">{duration}</span>
                 </div>
 
                 <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                    <span className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Intensity</span>
-                    <span className="text-sm font-bold text-text-primary">{intensity}</span>
+                    <span className="font-manrope text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#72BF6A' }}>Intensity</span>
+                    <span className="font-manrope text-sm font-bold text-text-primary">{intensity}</span>
                 </div>
 
                 <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                    <span className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Equipment</span>
-                    <span className="text-sm font-bold text-text-primary">{equipment}</span>
+                    <span className="font-manrope text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#72BF6A' }}>Equipment</span>
+                    <span className="font-manrope text-sm font-bold text-text-primary">{equipment}</span>
                 </div>
 
                 <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
-                    <span className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Participants</span>
-                    <span className="text-sm font-bold text-text-primary">Max {capacity}</span>
+                    <span className="font-manrope text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#72BF6A' }}>Paricipants</span>
+                    <span className="font-manrope text-sm font-bold text-text-primary">Max {capacity}</span>
                 </div>
             </div>
         </div>
