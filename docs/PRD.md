@@ -1,8 +1,10 @@
 Product Requirements Document (PRD)
 SlotTrack – Cure.fit Class Booking System
 Team: Byte3
+Members : Parnil Vyawahare, Prithvi Rajvanshi, Ruhaa Bhalerao.
 Course: Simulated Work Integration (SWI)
 Version: 1.0
+
 ________________________________________
 1. Introduction
 Project Overview
