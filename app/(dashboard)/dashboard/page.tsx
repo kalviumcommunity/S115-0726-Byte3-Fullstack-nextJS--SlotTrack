@@ -29,23 +29,26 @@ export default function UserDashboardPage() {
     }));
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      {/* Left Main Section: Available Classes List */}
-      <div className="lg:col-span-8 space-y-6">
-        <SectionHeading
-          title="Available Classes"
-          subtitle="Choose a class that fits your energy today"
-        />
+    <div className="space-y-6">
+      {/* Header Section outside of the columns to align them top-horizontally */}
+      <SectionHeading
+        title="Available Classes"
+        subtitle="Choose a class that fits your energy today"
+      />
 
-        <ClassGrid classes={processedClasses} onBookToggle={toggleBookClass} />
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Main Section: Available Classes List */}
+        <div className="lg:col-span-8">
+          <ClassGrid classes={processedClasses} onBookToggle={toggleBookClass} />
+        </div>
 
-      {/* Right Fixed Section: Today's Schedule Sidebar */}
-      <div className="lg:col-span-4 lg:sticky lg:top-[150px]">
-        <ScheduleSidebar
-          scheduleItems={sidebarScheduleItems}
-          onCancelBooking={toggleBookClass}
-        />
+        {/* Right Fixed Section: Today's Schedule Sidebar */}
+        <div className="lg:col-span-4 lg:sticky lg:top-[112px]">
+          <ScheduleSidebar
+            scheduleItems={sidebarScheduleItems}
+            onCancelBooking={toggleBookClass}
+          />
+        </div>
       </div>
     </div>
   );

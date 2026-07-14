@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import ScheduleItem, { ScheduleItemProps } from "./ScheduleItem";
-import Modal from "../ui/Modal";
+import { Calendar, Sparkles } from "lucide-react";
 
 export interface ScheduleSidebarProps {
   scheduleItems: Omit<ScheduleItemProps, "onCancel">[];
@@ -13,8 +13,6 @@ export default function ScheduleSidebar({
   scheduleItems,
   onCancelBooking,
 }: ScheduleSidebarProps) {
-  const [isFullScheduleOpen, setIsFullScheduleOpen] = useState(false);
-
   // Format today's date dynamically to resemble Figma: "Today | 13 July | Monday"
   const getFigmaFormattedDate = () => {
     const today = new Date();
@@ -25,7 +23,7 @@ export default function ScheduleSidebar({
   };
 
   return (
-    <div className="bg-white border border-[#EEF2F6] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 flex flex-col h-full">
+    <div className="bg-white border border-[#EEF2F6] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 flex flex-col min-h-[460px] md:min-h-[540px]">
       {/* Sidebar Header */}
       <div className="mb-6">
         <h3 className="font-sans font-bold text-2xl text-[#111827] mb-1">
@@ -37,63 +35,54 @@ export default function ScheduleSidebar({
       </div>
 
       {/* Scrollable Schedule list */}
-      <div className="flex-1 overflow-y-auto space-y-2 max-h-[380px] md:max-h-[500px] pr-1 scrollbar-thin">
-        {scheduleItems.length > 0 ? (
-          scheduleItems.map((item) => (
-            <ScheduleItem
-              key={item.id}
-              id={item.id}
-              title={item.title}
-              time={item.time}
-              status={item.status}
-              location={item.location}
-              onCancel={onCancelBooking}
-            />
-          ))
-        ) : (
-          <div className="text-center py-8 text-[#6B7280]">
-            <p className="text-sm font-semibold">No classes scheduled today</p>
-            <p className="text-xs mt-1">Book some sessions to see them here.</p>
+      <div className="flex-1 flex flex-col justify-between">
+        <div className={`overflow-y-auto space-y-2 max-h-[360px] md:max-h-[420px] pr-1 scrollbar-thin flex-1 flex flex-col ${
+          scheduleItems.length === 0 ? "justify-center" : "justify-start"
+        }`}>
+          {scheduleItems.length > 0 ? (
+            <div className="space-y-2 w-full">
+              {scheduleItems.map((item) => (
+                <ScheduleItem
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  time={item.time}
+                  status={item.status}
+                  location={item.location}
+                  onCancel={onCancelBooking}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-4 my-auto">
+              <div className="h-16 w-16 rounded-full bg-gray-50 flex items-center justify-center text-text-secondary border border-gray-100">
+                <Calendar className="h-8 w-8 text-gray-400 stroke-[1.5]" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-text-primary">Your schedule is empty</p>
+                <p className="text-xs text-text-secondary max-w-[220px]">
+                  Explore available classes and book a slot to start tracking your progress!
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Suggestion Card for empty slots (shown when 1 or 2 classes are booked) */}
+        {scheduleItems.length > 0 && scheduleItems.length < 3 && (
+          <div className="border border-dashed border-gray-200 bg-gray-50/50 rounded-[20px] p-5 flex flex-col items-center text-center sm:text-left sm:items-start sm:flex-row gap-4 mt-6 shrink-0">
+            <div className="h-11 w-11 rounded-full bg-[#72BF6A]/10 flex items-center justify-center text-[#72BF6A] shrink-0">
+              <Sparkles className="h-5.5 w-5.5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-[#111827]">Ready for another one?</h4>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                Add another class today to make the most of your routine and hit your fitness milestones!
+              </p>
+            </div>
           </div>
         )}
       </div>
-
-      {/* View Full Schedule Button */}
-      <button
-        onClick={() => setIsFullScheduleOpen(true)}
-        className="w-full mt-6 bg-[#EEF2F6] hover:bg-[#e2e8f0] text-[#111827] font-bold py-3.5 px-4 rounded-[14px] transition-colors duration-300 text-sm active:scale-[0.98]"
-      >
-        View Full Schedule
-      </button>
-
-      {/* Full Schedule Modal */}
-      <Modal
-        isOpen={isFullScheduleOpen}
-        onClose={() => setIsFullScheduleOpen(false)}
-        title="Full Timetable Schedule"
-      >
-        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
-          <p className="text-sm text-[#6B7280] font-medium mb-2">
-            Weekly slots showing all available fitness classes.
-          </p>
-          {scheduleItems.map((item, idx) => (
-            <div
-              key={idx}
-              className="flex justify-between items-center py-3 border-b border-[#EEF2F6]"
-            >
-              <div>
-                <h4 className="font-bold text-[#111827]">{item.title}</h4>
-                <p className="text-xs text-[#6B7280] font-medium">
-                  {item.time} • {item.location}
-                </p>
-              </div>
-              <span className="text-xs font-bold text-[#72BF6A] uppercase bg-[#72BF6A]/10 px-2.5 py-1 rounded-full">
-                Available
-              </span>
-            </div>
-          ))}
-        </div>
-      </Modal>
     </div>
   );
 }

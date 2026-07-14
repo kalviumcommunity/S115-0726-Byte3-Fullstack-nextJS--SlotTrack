@@ -63,7 +63,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
 
       {/* Main Details and Booking Widget Card */}
       <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
-        <div className="flex flex-col gap-8 lg:flex-row lg:justify-between lg:items-center">
+        <div className="flex flex-col gap-8 lg:flex-row lg:justify-between lg:items-start lg:gap-12">
           {/* Details list */}
           <div className="flex-1">
             <BookingDetails
@@ -79,7 +79,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
           </div>
 
           {/* Booking Widget card */}
-          <div className="shrink-0 lg:border-l lg:border-border lg:pl-10">
+          <div className="w-full lg:w-[310px] shrink-0">
             <BookingWidget
               classId={currentClass.id}
               availableSeats={currentAvailableSeats}
