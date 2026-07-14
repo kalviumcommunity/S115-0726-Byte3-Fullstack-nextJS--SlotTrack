@@ -37,7 +37,7 @@ export default function Drawer({ isOpen, onClose, title, children }: DrawerProps
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm transition-opacity duration-300",
+        "fixed inset-0 z-50 flex justify-end bg-black/40 transition-opacity duration-300",
         isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       )}
       onClick={handleBackdropClick}
