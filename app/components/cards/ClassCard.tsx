@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Badge from "../ui/Badge";
 import Button from "../ui/Button";
 
@@ -83,13 +84,14 @@ export default function ClassCard({
         </div>
 
         {/* Action Button */}
-        <Button
-          variant={isBooked ? "outline" : "primary"}
-          className="w-full text-base font-bold py-3 mt-2"
-          onClick={() => onBookToggle && onBookToggle(id)}
-        >
-          {isBooked ? "Cancel Booking" : "Book Class"}
-        </Button>
+        <Link href={`/booking/${id}`} className="w-full mt-2 block">
+          <Button
+            variant={isBooked ? "outline" : "primary"}
+            className="w-full text-base font-bold py-3"
+          >
+            {isBooked ? "Cancel Booking" : "Book Now"}
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -5,7 +5,20 @@
   --foreground: #111827;
 }
 
-@theme inline {
+@theme {
+  --color-primary: #72BF6A;
+  --color-primary-hover: #5fa858;
+  --color-surface: #ffffff;
+  --color-border: #eef2f6;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-bg-base: #f8f8fa;
+  --color-danger: #ef4444;
+  --radius-button: 12px;
+  --radius-card: 24px;
+  --radius-input: 12px;
+  --shadow-card: 0 8px 30px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 16px 40px rgba(0,0,0,0.12);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 }

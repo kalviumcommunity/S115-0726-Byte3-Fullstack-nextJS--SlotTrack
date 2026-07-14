@@ -1,29 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
-import BookingDetails from "../../components/booking/BookingDetails";
-import BookingWidget from "../../components/booking/BookingWidget";
-import AboutClass from "../../components/booking/AboutClass";
-import InstructorCard from "../../components/cards/InstructorCard";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function BookingPage() {
-  // Simulate active states on the booking page
-  const [availableSeats, setAvailableSeats] = useState(5);
-  const [bookedSeats, setBookedSeats] = useState(20);
-  const [isBooked, setIsBooked] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+export default function BookingFallbackPage() {
+  const router = useRouter();
 
-  const handleBooking = () => {
-    setIsLoading(true);
-    // Simulate booking duration response
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsBooked(true);
-      setAvailableSeats((prev) => prev - 1);
-      setBookedSeats((prev) => prev + 1);
-    }, 1500);
-  };
+  useEffect(() => {
+    router.replace("/dashboard");
+  }, [router]);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
