@@ -43,7 +43,7 @@ export default function BookingPage() {
 
       {/* Main Details and Booking Widget Card */}
       <div className="rounded-[24px] border border-gray-100 bg-white p-6 md:p-8 shadow-card mb-8">
-        <div className="flex flex-col gap-8 lg:flex-row lg:justify-between lg:items-center">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
           {/* Details list */}
           <div className="flex-1">
             <BookingDetails
@@ -58,8 +58,8 @@ export default function BookingPage() {
             />
           </div>
 
-          {/* Booking Widget card */}
-          <div className="shrink-0 lg:border-l lg:border-gray-100 lg:pl-10">
+          {/* Booking Widget */}
+          <div className="shrink-0">
             <BookingWidget
               availableSeats={availableSeats}
               capacity={25}
