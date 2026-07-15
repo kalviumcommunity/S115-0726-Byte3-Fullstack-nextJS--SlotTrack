@@ -66,6 +66,7 @@ export default function ProfileDrawer({
           <button
             onClick={() => {
               onClose();
+              window.location.href = "/login";
             }}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-danger/10 text-danger rounded-input hover:bg-danger/20 transition-all duration-200 font-bold text-sm cursor-pointer"
           >
