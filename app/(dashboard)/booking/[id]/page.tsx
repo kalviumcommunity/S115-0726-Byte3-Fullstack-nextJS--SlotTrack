@@ -6,6 +6,7 @@ import BookingDetails from "@/app/components/booking/BookingDetails";
 import BookingWidget from "@/app/components/booking/BookingWidget";
 import AboutClass from "@/app/components/booking/AboutClass";
 import InstructorCard from "@/app/components/cards/InstructorCard";
+import ContactCard from "@/app/components/booking/ContactCard";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { DASHBOARD_CLASSES } from "@/app/lib/mockData";
 import Link from "next/link";
@@ -104,7 +105,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
       </div>
 
       {/* Instructor Section Card */}
-      <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card">
+      <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
         <InstructorCard
           name={currentClass.instructorName}
           role={currentClass.instructorRole}
@@ -114,6 +115,12 @@ export default function DynamicBookingPage({ params }: PageProps) {
           certified={true}
         />
       </div>
+
+      {/* Contact / Support Card */}
+      <ContactCard
+        phone="1234567890"
+        email="support.slottrack@cult.fit"
+      />
     </div>
   );
 }
