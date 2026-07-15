@@ -1,13 +1,63 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(MEMBER)
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model FitnessClass {
+  id             String    @id @default(cuid())
+  title          String
+  description    String
+  instructor     String
+  category       String
+  imageUrl       String
+  location       String
+  startTime      DateTime
+  endTime        DateTime
+  capacity       Int
+  availableSeats Int
+  bookings       Booking[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  userId      String
+  classId     String
+  status      BookingStatus @default(ACTIVE)
+  bookedAt    DateTime      @default(now())
+  cancelledAt DateTime?
+  createdAt   DateTime      @default(now())
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class       FitnessClass  @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, classId])
 }
