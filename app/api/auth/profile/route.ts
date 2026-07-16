@@ -1,27 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/lib/auth';
 import { userController } from '@/app/controllers/user.controller';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Retrieve profile details for the authenticated user
-    // const userId = "session-user-id";
-    // const result = await userController.getProfile(userId);
-    // return NextResponse.json(result);
-    return NextResponse.json({ message: 'Profile GET endpoint not implemented' }, { status: 501 });
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      const error = new Error('Unauthorized');
+      (error as any).status = 401;
+      throw error;
+    }
+
+    const userId = (session.user as any).id;
+    const result = await userController.getProfile(userId);
+
+    return NextResponse.json({
+      success: true,
+      data: result,
+    });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    const status = error.status || 500;
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || 'Internal Server Error',
+      },
+      { status }
+    );
   }
 }
 
 export async function PATCH(request: NextRequest) {
   try {
-    // TODO: Update profile details for the authenticated user
-    // const userId = "session-user-id";
-    // const body = await request.json();
-    // const result = await userController.updateProfile(userId, body);
-    // return NextResponse.json(result);
-    return NextResponse.json({ message: 'Profile PATCH endpoint not implemented' }, { status: 501 });
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      const error = new Error('Unauthorized');
+      (error as any).status = 401;
+      throw error;
+    }
+
+    const userId = (session.user as any).id;
+    const body = await request.json();
+    const result = await userController.updateProfile(userId, body);
+
+    return NextResponse.json({
+      success: true,
+      data: result,
+    });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    const status = error.status || 500;
+    return NextResponse.json(
+      {
+        success: false,
+        error: error.message || 'Internal Server Error',
+      },
+      { status }
+    );
   }
 }

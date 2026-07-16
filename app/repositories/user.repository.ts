@@ -1,15 +1,19 @@
 import prisma from '../lib/prisma';
+import { User } from '../generated/prisma';
 
 export const userRepository = {
-  // TODO: Implement finding a user by ID using prisma
-  async findById(id: string): Promise<any> {
-    // prisma.user.findUnique(...)
-    return null;
+  async findById(id: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { id },
+    });
   },
 
-  // TODO: Implement updating user profile information using prisma
-  async update(id: string, data: any): Promise<any> {
-    // prisma.user.update(...)
-    return null;
-  }
+  async update(id: string, data: { name: string }): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        name: data.name,
+      },
+    });
+  },
 };
