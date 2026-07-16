@@ -1,15 +1,21 @@
 import prisma from '../lib/prisma';
+import { User } from '../generated/prisma';
 
 export const authRepository = {
-  // TODO: Implement finding a user by email using prisma
-  async findByEmail(email: string): Promise<any> {
-    // prisma.user.findUnique(...)
-    return null;
+  async findByEmail(email: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { email },
+    });
   },
 
-  // TODO: Implement creating a new user using prisma
-  async createUser(data: any): Promise<any> {
-    // prisma.user.create(...)
-    return null;
-  }
+  async createUser(data: { name: string; email: string; passwordHash: string }): Promise<User> {
+    return prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        password: data.passwordHash,
+        role: 'MEMBER', // Default role
+      },
+    });
+  },
 };
