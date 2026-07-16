@@ -5,6 +5,10 @@ A real-time fitness class booking system built for the **Cure.fit Class Booking 
 ## Team Byte3
 
 SlotTrack is developed by **Team Byte3**.
+Memeber : 
+1. Parnil Vyawahare
+2. Ruhaa Bhalerao
+3. Prithvi Rajvanshi
 
 ---
 

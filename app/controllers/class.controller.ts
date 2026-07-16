@@ -1,28 +1,29 @@
 import { classService } from '../services/class.service';
+import { FitnessClass } from '../generated/prisma';
 
 export const classController = {
-  // TODO: Handle getting all classes
-  async getClasses(): Promise<any[]> {
-    return classService.getClasses();
+  // Retrieve all fitness classes with optional filters
+  async getClasses(filters?: { category?: string; location?: string }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
+    return classService.getClasses(filters);
   },
 
-  // TODO: Handle getting class by ID
-  async getClassById(id: string): Promise<any> {
+  // Retrieve class by ID
+  async getClassById(id: string): Promise<FitnessClass> {
     return classService.getClassById(id);
   },
 
-  // TODO: Handle class creation
-  async createClass(data: any): Promise<any> {
-    return classService.createClass(data);
+  // Handle class creation
+  async createClass(data: unknown, userRole: string): Promise<FitnessClass> {
+    return classService.createClass(data, userRole);
   },
 
-  // TODO: Handle updating class details
-  async updateClass(id: string, data: any): Promise<any> {
-    return classService.updateClass(id, data);
+  // Handle updating class details
+  async updateClass(id: string, data: unknown, userRole: string): Promise<FitnessClass> {
+    return classService.updateClass(id, data, userRole);
   },
 
-  // TODO: Handle class deletion
-  async deleteClass(id: string): Promise<any> {
-    return classService.deleteClass(id);
-  }
+  // Handle class deletion
+  async deleteClass(id: string, userRole: string): Promise<{ id: string; message: string }> {
+    return classService.deleteClass(id, userRole);
+  },
 };

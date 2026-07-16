@@ -1,33 +1,99 @@
 import prisma from '../lib/prisma';
+import { FitnessClass } from '../generated/prisma';
 
 export const classRepository = {
-  // TODO: Implement finding all fitness classes
-  async findAll(): Promise<any[]> {
-    // prisma.fitnessClass.findMany(...)
-    return [];
+  // Find all fitness classes matching filters, ordered by startTime ascending
+  async findAll(filters?: { category?: string; location?: string }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
+    const where: { category?: string; location?: string } = {};
+    if (filters?.category) {
+      where.category = filters.category;
+    }
+    if (filters?.location) {
+      where.location = filters.location;
+    }
+
+    return prisma.fitnessClass.findMany({
+      where,
+      orderBy: {
+        startTime: 'asc',
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        instructor: true,
+        category: true,
+        imageUrl: true,
+        location: true,
+        startTime: true,
+        endTime: true,
+        capacity: true,
+        availableSeats: true,
+      },
+    });
   },
 
-  // TODO: Implement finding a class by ID
-  async findById(id: string): Promise<any> {
-    // prisma.fitnessClass.findUnique(...)
-    return null;
+  // Find a fitness class by ID
+  async findById(id: string): Promise<FitnessClass | null> {
+    return prisma.fitnessClass.findUnique({
+      where: { id },
+    });
   },
 
-  // TODO: Implement creating a new fitness class
-  async create(data: any): Promise<any> {
-    // prisma.fitnessClass.create(...)
-    return null;
+  // Create a new fitness class
+  async create(data: {
+    title: string;
+    description: string;
+    instructor: string;
+    category: string;
+    imageUrl: string;
+    location: string;
+    startTime: Date;
+    endTime: Date;
+    capacity: number;
+    availableSeats: number;
+  }): Promise<FitnessClass> {
+    return prisma.fitnessClass.create({
+      data,
+    });
   },
 
-  // TODO: Implement updating a fitness class
-  async update(id: string, data: any): Promise<any> {
-    // prisma.fitnessClass.update(...)
-    return null;
+  // Update a fitness class
+  async update(
+    id: string,
+    data: {
+      title?: string;
+      description?: string;
+      instructor?: string;
+      category?: string;
+      imageUrl?: string;
+      location?: string;
+      startTime?: Date;
+      endTime?: Date;
+      capacity?: number;
+      availableSeats?: number;
+    }
+  ): Promise<FitnessClass> {
+    return prisma.fitnessClass.update({
+      where: { id },
+      data,
+    });
   },
 
-  // TODO: Implement deleting a fitness class
-  async delete(id: string): Promise<any> {
-    // prisma.fitnessClass.delete(...)
-    return null;
-  }
+  // Delete a fitness class
+  async delete(id: string): Promise<FitnessClass> {
+    return prisma.fitnessClass.delete({
+      where: { id },
+    });
+  },
+
+  // Count active bookings for a fitness class
+  async countBookings(classId: string): Promise<number> {
+    return prisma.booking.count({
+      where: {
+        classId,
+        status: 'ACTIVE',
+      },
+    });
+  },
 };
