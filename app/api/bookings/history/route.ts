@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bookingController } from '@/app/controllers/booking.controller';
+import { getAuthenticatedUser } from '@/app/lib/utils';
 
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Retrieve booking history for the authenticated user
-    // const userId = "session-user-id";
-    // const result = await bookingController.getHistory(userId);
-    // return NextResponse.json(result);
-    return NextResponse.json({ message: 'Get booking history endpoint not implemented' }, { status: 501 });
+    const user = getAuthenticatedUser(request);
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get('page');
+    const limit = searchParams.get('limit');
+
+    const result = await bookingController.getHistory(user.userId, { page, limit });
+    return NextResponse.json({ success: true, data: result });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    const statusCode = error.statusCode || 500;
+    return NextResponse.json(
+      { success: false, error: error.message || 'Internal Server Error' },
+      { status: statusCode }
+    );
   }
 }

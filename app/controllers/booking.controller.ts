@@ -1,23 +1,27 @@
 import { bookingService } from '../services/booking.service';
+import { bookingValidator } from '../validators/booking.validator';
+import { Role } from '../generated/prisma';
 
 export const bookingController = {
-  // TODO: Handle booking creation
-  async createBooking(data: any): Promise<any> {
-    return bookingService.createBooking(data);
+  // Handle booking creation
+  async createBooking(userId: string, data: any): Promise<any> {
+    const validatedData = bookingValidator.validateCreateBooking(data);
+    return bookingService.createBooking(userId, validatedData.classId);
   },
 
-  // TODO: Handle retrieving bookings
-  async getBookings(): Promise<any[]> {
-    return bookingService.getBookings();
+  // Handle retrieving bookings (all or user-filtered based on role)
+  async getBookings(userId: string, role: Role): Promise<any[]> {
+    return bookingService.getBookings(userId, role);
   },
 
-  // TODO: Handle retrieving user's booking history
-  async getHistory(userId: string): Promise<any[]> {
-    return bookingService.getHistory(userId);
+  // Handle retrieving user's booking history with pagination
+  async getHistory(userId: string, query: any): Promise<any> {
+    const validatedQuery = bookingValidator.validateHistoryQuery(query);
+    return bookingService.getHistory(userId, validatedQuery);
   },
 
-  // TODO: Handle booking cancellation
-  async cancelBooking(id: string): Promise<any> {
-    return bookingService.cancelBooking(id);
+  // Handle booking cancellation
+  async cancelBooking(id: string, userId: string, role: Role): Promise<any> {
+    return bookingService.cancelBooking(id, userId, role);
   }
 };
