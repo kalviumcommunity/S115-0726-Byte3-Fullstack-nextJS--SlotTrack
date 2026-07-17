@@ -21,7 +21,7 @@ const getPrismaClient = () => {
         if (prop === '$transaction') {
           return (val: any) => typeof val === 'function' ? val(prisma) : Promise.resolve([]);
         }
-        return new Proxy(() => {}, {
+        return new Proxy(() => { }, {
           get(t, p) {
             return () => Promise.resolve([]);
           },
@@ -34,7 +34,7 @@ const getPrismaClient = () => {
   }
 
   if (!globalThis.prismaGlobal) {
-    globalThis.prismaGlobal = new PrismaClient();
+    globalThis.prismaGlobal = prismaClientSingleton();
   }
   return globalThis.prismaGlobal;
 };
