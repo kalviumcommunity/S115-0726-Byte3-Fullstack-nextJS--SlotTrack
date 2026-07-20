@@ -34,7 +34,7 @@ const getPrismaClient = () => {
   }
 
   if (!globalThis.prismaGlobal) {
-    globalThis.prismaGlobal = new PrismaClient();
+    globalThis.prismaGlobal = prismaClientSingleton();
   }
   return globalThis.prismaGlobal;
 };
