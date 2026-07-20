@@ -8,11 +8,12 @@ export const userRepository = {
     });
   },
 
-  async update(id: string, data: { name: string }): Promise<User> {
+  async update(id: string, data: { name: string; gender?: string }): Promise<User> {
     return prisma.user.update({
       where: { id },
       data: {
         name: data.name,
+        gender: data.gender,
       },
     });
   },

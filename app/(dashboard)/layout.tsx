@@ -1,17 +1,25 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/navigation/Navbar";
 import ProfileDrawer from "../components/profile/ProfileDrawer";
 import { HistoryRow } from "../components/tables/HistoryTable";
+import { getBookings, bookClass, cancelBooking, getBookingHistory } from "@/app/lib/api/bookings";
+import { updateProfile } from "@/app/lib/api/users";
+import { BookingType } from "@/app/types/booking";
 
 // Define the dashboard state context
 interface DashboardContextType {
   isProfileOpen: boolean;
   setIsProfileOpen: (open: boolean) => void;
   bookedClassIds: string[];
-  toggleBookClass: (id: string) => void;
+  toggleBookClass: (id: string) => Promise<void>;
   history: HistoryRow[];
+  refreshData: () => Promise<void>;
+  selectedLocation: string;
+  setSelectedLocation: (loc: string) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -29,53 +37,126 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { data: session, status, update: updateSession } = useSession();
+  const router = useRouter();
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [bookedClassIds, setBookedClassIds] = useState<string[]>(["class-1", "class-3"]);
+  const [bookings, setBookings] = useState<BookingType[]>([]);
+  const [bookedClassIds, setBookedClassIds] = useState<string[]>([]);
+  const [history, setHistory] = useState<HistoryRow[]>([]);
+  const [profileName, setProfileName] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("Pune");
 
-  // Mock static history rows
-  const [history] = useState<HistoryRow[]>([
-    {
-      id: "hist-1",
-      title: "Strength Training",
-      category: "Strength",
-      date: "10 Jul 2026",
-      time: "08:00 AM - 09:00 AM",
-    },
-    {
-      id: "hist-2",
-      title: "Yoga",
-      category: "Yoga",
-      date: "10 Jul 2026",
-      time: "09:00 AM - 10:00 AM",
-    },
-    {
-      id: "hist-3",
-      title: "HIIT Cardio",
-      category: "Cardio",
-      date: "10 Jul 2026",
-      time: "10:00 AM - 11:00 AM",
-    },
-    {
-      id: "hist-4",
-      title: "Meditation",
-      category: "Mind",
-      date: "10 Jul 2026",
-      time: "06:00 AM - 07:00 AM",
-    },
-    {
-      id: "hist-5",
-      title: "Calisthenics",
-      category: "Strength",
-      date: "9 Jul 2026",
-      time: "04:00 PM - 06:00 PM",
-    },
-  ]);
+  const fetchData = async () => {
+    try {
+      const activeBookings = await getBookings();
+      setBookings(activeBookings);
+      setBookedClassIds(activeBookings.map((b) => b.classId));
 
-  const toggleBookClass = (id: string) => {
-    setBookedClassIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+      const historyData = await getBookingHistory(1, 20);
+      const mapped = historyData.records.map((b: any) => {
+        const cls = b.class;
+        const start = new Date(cls.startTime);
+        const end = cls.endTime ? new Date(cls.endTime) : null;
+        
+        const formattedDate = start.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+
+        const formatTimeStr = (d: Date) => {
+          return d.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          });
+        };
+        const timeStr = end ? `${formatTimeStr(start)} - ${formatTimeStr(end)}` : formatTimeStr(start);
+
+        return {
+          id: b.id,
+          title: cls.title,
+          category: cls.category || "Class",
+          date: formattedDate,
+          time: timeStr,
+        };
+      });
+      setHistory(mapped);
+    } catch (err) {
+      console.error("Failed to load user bookings/history", err);
+    }
   };
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    } else if (status === "authenticated") {
+      fetchData();
+      if (session?.user?.name) {
+        setProfileName(session.user.name);
+      }
+    }
+  }, [status, session]);
+
+  const toggleBookClass = async (classId: string) => {
+    const existingBooking = bookings.find((b) => b.classId === classId && b.status === "ACTIVE");
+    if (existingBooking) {
+      try {
+        await cancelBooking(existingBooking.id);
+        await fetchData();
+      } catch (err: any) {
+        alert(err.message || "Failed to cancel booking");
+      }
+    } else {
+      try {
+        await bookClass(classId);
+        await fetchData();
+      } catch (err: any) {
+        alert(err.message || "Failed to book class");
+      }
+    }
+  };
+
+  const handleProfileUpdate = async (newName: string, newGender?: string) => {
+    try {
+      const updatedUser = await updateProfile({ name: newName, gender: newGender });
+      setProfileName(updatedUser.name);
+      
+      // Update session so it propagates to header/navbar
+      if (updateSession) {
+        await updateSession({
+          ...session,
+          user: {
+            ...session?.user,
+            name: updatedUser.name,
+            gender: updatedUser.gender,
+          },
+        });
+      }
+      
+      alert("Profile updated successfully!");
+    } catch (err: any) {
+      alert(err.message || "Failed to update profile");
+    }
+  };
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8FA]">
+        <div className="flex flex-col items-center gap-4">
+          <svg className="animate-spin h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <span className="font-semibold text-text-secondary">Loading your profile...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const nameToDisplay = profileName || session?.user?.name || "John Doe";
+  const userRole = (session?.user as any)?.role || "MEMBER";
 
   return (
     <DashboardContext.Provider
@@ -85,11 +166,18 @@ export default function DashboardLayout({
         bookedClassIds,
         toggleBookClass,
         history,
+        refreshData: fetchData,
+        selectedLocation,
+        setSelectedLocation,
       }}
     >
       <div className="min-h-screen bg-[#F8F8FA] flex flex-col font-sans antialiased text-[#111827]">
         {/* Navigation header bar */}
-        <Navbar onProfileClick={() => setIsProfileOpen(true)} />
+        <Navbar
+          onProfileClick={() => setIsProfileOpen(true)}
+          userName={nameToDisplay}
+          role={userRole}
+        />
 
         {/* Spacing for fixed Navbar (height ~72px) */}
         <div className="h-[64px] md:h-[72px] shrink-0" />
@@ -103,11 +191,12 @@ export default function DashboardLayout({
         <ProfileDrawer
           isOpen={isProfileOpen}
           onClose={() => setIsProfileOpen(false)}
-          userName="John Doe"
+          userName={nameToDisplay}
           userAge={21}
-          userContact="9876543210"
-          userGender="Male"
+          userContact={session?.user?.email || ""}
+          userGender={(session?.user as any)?.gender || "Male"}
           history={history}
+          onProfileUpdate={handleProfileUpdate}
         />
       </div>
     </DashboardContext.Provider>

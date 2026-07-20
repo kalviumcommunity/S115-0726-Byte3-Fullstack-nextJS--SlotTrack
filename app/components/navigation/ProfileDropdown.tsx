@@ -7,13 +7,17 @@ export interface ProfileDropdownProps {
   onProfileClick: () => void;
   userName?: string;
   avatarUrl?: string;
+  role?: string;
 }
 
 export default function ProfileDropdown({
   onProfileClick,
   userName = "John Doe",
   avatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop",
+  role = "MEMBER",
 }: ProfileDropdownProps) {
+  const displayRole = role === "ADMIN" ? "Instructor" : "Member";
+
   return (
     <div className="relative">
       <button
@@ -28,7 +32,7 @@ export default function ProfileDropdown({
         />
         <div className="hidden sm:block font-sans">
           <div className="text-sm font-bold text-text-primary leading-tight font-manrope">Hi, {userName}</div>
-          <div className="text-xs text-text-secondary font-semibold leading-tight font-manrope">Member</div>
+          <div className="text-xs text-text-secondary font-semibold leading-tight font-manrope">{displayRole}</div>
         </div>
       </button>
     </div>

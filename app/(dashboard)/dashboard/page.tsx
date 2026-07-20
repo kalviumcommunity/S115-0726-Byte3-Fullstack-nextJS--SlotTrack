@@ -1,25 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDashboard } from "../layout";
 import SectionHeading from "@/app/components/ui/SectionHeading";
 import ClassGrid from "@/app/components/cards/ClassGrid";
 import ScheduleSidebar from "@/app/components/schedule/ScheduleSidebar";
 import { ClassCardProps } from "@/app/components/cards/ClassCard";
-import { DASHBOARD_CLASSES } from "@/app/lib/mockData";
+import { getClasses } from "@/app/lib/api/classes";
+import { FitnessClassType } from "@/app/types/fitness-class";
 
 export default function UserDashboardPage() {
-  const { bookedClassIds, toggleBookClass } = useDashboard();
+  const { bookedClassIds, toggleBookClass, selectedLocation } = useDashboard();
+  const [classes, setClasses] = useState<FitnessClassType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      setLoading(true);
+      try {
+        const data = await getClasses({ location: selectedLocation });
+        setClasses(data);
+      } catch (err) {
+        console.error("Failed to fetch classes", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClasses();
+  }, [selectedLocation]);
 
   // Combine booking status with our class properties
-  const processedClasses: ClassCardProps[] = DASHBOARD_CLASSES.map((cls) => ({
-    ...cls,
-    isBooked: bookedClassIds.includes(cls.id),
-  }));
+  const processedClasses: ClassCardProps[] = classes.map((cls) => {
+    const start = new Date(cls.startTime);
+    const end = new Date(cls.endTime);
+    
+    const formattedDate = start.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
-  // Extract unique categories dynamically from DASHBOARD_CLASSES
-  const categories = ["All", ...Array.from(new Set(DASHBOARD_CLASSES.map((cls) => cls.category)))];
+    const formatTimeStr = (d: Date) => {
+      return d.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    };
+    const timeStr = `${formatTimeStr(start)} - ${formatTimeStr(end)}`;
+
+    return {
+      id: cls.id,
+      title: cls.title,
+      category: cls.category,
+      image: cls.imageUrl || "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop",
+      date: formattedDate,
+      time: timeStr,
+      location: cls.location,
+      isBooked: bookedClassIds.includes(cls.id),
+    };
+  });
+
+  // Extract unique categories dynamically from classes
+  const categories = ["All", ...Array.from(new Set(classes.map((cls) => cls.category)))];
 
   // Filter classes based on selected category
   const filteredClasses = processedClasses.filter(
@@ -27,7 +71,7 @@ export default function UserDashboardPage() {
   );
 
   // Build the list of schedule items for the sidebar based on booking list state
-  const sidebarScheduleItems = DASHBOARD_CLASSES
+  const sidebarScheduleItems = processedClasses
     .filter((cls) => bookedClassIds.includes(cls.id))
     .map((cls) => ({
       id: cls.id,
@@ -68,7 +112,16 @@ export default function UserDashboardPage() {
             })}
           </div>
 
-          <ClassGrid classes={filteredClasses} onBookToggle={toggleBookClass} />
+          {loading ? (
+            <div className="min-h-[300px] flex items-center justify-center">
+              <svg className="animate-spin h-8 w-8 text-[#72BF6A]" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            </div>
+          ) : (
+            <ClassGrid classes={filteredClasses} onBookToggle={toggleBookClass} />
+          )}
         </div>
 
         {/* Right Fixed Section: Today's Schedule Sidebar */}

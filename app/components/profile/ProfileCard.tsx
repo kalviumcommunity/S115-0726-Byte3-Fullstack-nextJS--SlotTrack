@@ -10,7 +10,7 @@ export interface ProfileCardProps {
   contact?: string;
   gender?: string;
   avatarUrl?: string;
-  onEditToggle?: () => void;
+  onEditToggle?: (name: string, gender?: string) => void;
 }
 
 export default function ProfileCard({
@@ -24,9 +24,13 @@ export default function ProfileCard({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ name, age, contact, gender });
 
+  React.useEffect(() => {
+    setFormData({ name, age, contact, gender });
+  }, [name, age, contact, gender]);
+
   const handleSave = () => {
     setIsEditing(false);
-    if (onEditToggle) onEditToggle();
+    if (onEditToggle) onEditToggle(formData.name, formData.gender);
   };
 
   return (
@@ -80,13 +84,13 @@ export default function ProfileCard({
             </div>
 
             <div className="flex justify-center sm:justify-start items-center space-x-1.5">
-              <span className="text-[#6B7280]">Contact:</span>
+              <span className="text-[#6B7280]">Email:</span>
               {isEditing ? (
                 <input
                   type="text"
                   value={formData.contact}
-                  onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                  className="border border-[#EEF2F6] rounded px-1.5 py-0.5 outline-[#72BF6A]"
+                  className="border border-[#EEF2F6] rounded px-1.5 py-0.5 outline-[#72BF6A] bg-[#F1F5F9] cursor-not-allowed"
+                  disabled
                 />
               ) : (
                 <span>{formData.contact}</span>
