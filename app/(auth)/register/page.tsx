@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { register } from "@/app/lib/api/auth";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Card from "@/app/components/ui/Card";
 import Input from "@/app/components/ui/Input";
@@ -13,14 +15,48 @@ export default function RegisterPage() {
   const [role, setRole] = useState<"member" | "admin">("member");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("Male");
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Replace with backend authentication
-    router.replace("/dashboard");
+    setError("");
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    setLoading(true);
+    try {
+      await register({
+        name: fullName,
+        email,
+        password,
+        role: role.toUpperCase(),
+        employeeId: role === "admin" ? employeeId : undefined,
+        gender,
+      });
+
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (res?.error) {
+        setError("Account created, but auto-login failed. Please sign in manually.");
+      } else {
+        router.replace("/dashboard");
+        router.refresh();
+      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred during registration");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,6 +104,12 @@ export default function RegisterPage() {
           </button>
         </div>
 
+        {error && (
+          <div className="p-3 mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleRegister} className="space-y-4">
           <Input
             label="Full Name"
@@ -88,6 +130,22 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+
+          <div className="flex flex-col gap-1.5 w-full">
+            <label htmlFor="gender" className="text-sm font-semibold text-text-primary font-manrope">
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full h-11 px-3.5 bg-surface border border-border rounded-input text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm font-manrope cursor-pointer"
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
 
           {role === "admin" && (
             <Input
@@ -121,7 +179,12 @@ export default function RegisterPage() {
             required
           />
 
-          <Button type="submit" variant="primary" className="w-full text-base font-bold py-3">
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full text-base font-bold py-3"
+            isLoading={loading}
+          >
             Create Account
           </Button>
         </form>

@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Plus, Edit3, Trash2, MoreHorizontal, ArrowRight, Dumbbell, Flame, Flower2, Activity, Sparkles, HelpCircle } from "lucide-react";
 import Card from "@/app/components/ui/Card";
 import Button from "@/app/components/ui/Button";
@@ -9,10 +11,59 @@ import CreateClassModal from "@/app/components/feedback/CreateClassModal";
 import EditClassForm from "@/app/components/forms/EditClassForm";
 import Table, { TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/app/components/ui/Table";
 import { FitnessClass } from "@/app/interfaces/class";
-import { INITIAL_CLASSES, getTodayDateString, formatDisplayDate } from "@/app/lib/mockData";
+import { formatDisplayDate } from "@/app/lib/mockData";
 import { cn } from "@/app/lib/utils";
+import { getClasses, createClass, updateClass, deleteClass } from "@/app/lib/api/classes";
 
 const ITEMS_PER_PAGE = 5;
+
+const convertToISO = (dateStr: string, timeStr: string) => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const [time, modifier] = timeStr.split(" ");
+  let [hours, minutes] = time.split(":").map(Number);
+  
+  if (modifier) {
+    if (modifier.toUpperCase() === "PM" && hours < 12) {
+      hours += 12;
+    }
+    if (modifier.toUpperCase() === "AM" && hours === 12) {
+      hours = 0;
+    }
+  }
+  
+  const date = new Date(year, month - 1, day, hours, minutes, 0, 0);
+  return date.toISOString();
+};
+
+const mapDbClassToUI = (cls: any): FitnessClass => {
+  const start = new Date(cls.startTime);
+  const end = new Date(cls.endTime);
+  
+  const year = start.getFullYear();
+  const month = String(start.getMonth() + 1).padStart(2, "0");
+  const day = String(start.getDate()).padStart(2, "0");
+  const dateStr = `${year}-${month}-${day}`;
+
+  const formatTime = (d: Date) => {
+    return d.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  return {
+    id: cls.id,
+    title: cls.title,
+    category: cls.category,
+    instructor: cls.instructor,
+    startTime: formatTime(start),
+    endTime: formatTime(end),
+    date: dateStr,
+    capacity: cls.capacity,
+    availableSeats: cls.availableSeats,
+  };
+};
 
 export function getCategoryIcon(categoryOrTitle: string) {
   const norm = categoryOrTitle.toLowerCase();
@@ -35,12 +86,47 @@ export function getCategoryIcon(categoryOrTitle: string) {
 }
 
 export default function AdminDashboardPage() {
-  const [classes, setClasses] = useState<FitnessClass[]>(INITIAL_CLASSES);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const [classes, setClasses] = useState<FitnessClass[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<FitnessClass | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  const todayStr = getTodayDateString();
+  const fetchAdminClasses = async () => {
+    setLoading(true);
+    try {
+      const data = await getClasses();
+      setClasses(data.map(mapDbClassToUI));
+    } catch (err) {
+      console.error("Failed to load admin classes", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    } else if (status === "authenticated") {
+      const userRole = (session?.user as any)?.role;
+      if (userRole !== "ADMIN") {
+        router.replace("/dashboard");
+      } else {
+        fetchAdminClasses();
+      }
+    }
+  }, [status, session]);
+
+  const todayStr = useMemo(() => {
+    const start = new Date();
+    const year = start.getFullYear();
+    const month = String(start.getMonth() + 1).padStart(2, "0");
+    const day = String(start.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, []);
 
   const todayClasses = useMemo(() => {
     return classes.filter((cls) => cls.date === todayStr);
@@ -57,7 +143,7 @@ export default function AdminDashboardPage() {
 
   const totalPages = Math.ceil(historyClasses.length / ITEMS_PER_PAGE);
 
-  const handleCreateSubmit = (data: {
+  const handleCreateSubmit = async (data: {
     title: string;
     category: string;
     startTime: string;
@@ -65,22 +151,30 @@ export default function AdminDashboardPage() {
     date: string;
     capacity: number;
   }) => {
-    const newClass: FitnessClass = {
-      id: `class-${Date.now()}`,
-      title: data.title,
-      category: data.category,
-      instructor: "John",
-      startTime: data.startTime,
-      endTime: data.endTime,
-      date: data.date,
-      capacity: data.capacity,
-      availableSeats: data.capacity,
-    };
-    setClasses((prev) => [newClass, ...prev]);
-    setIsCreateOpen(false);
+    try {
+      const startISO = convertToISO(data.date, data.startTime);
+      const endISO = convertToISO(data.date, data.endTime);
+      
+      await createClass({
+        title: data.title,
+        category: data.category,
+        startTime: startISO,
+        endTime: endISO,
+        capacity: Number(data.capacity),
+        instructor: "Senior Instructor",
+        description: `Join this premium ${data.title} class to boost your fitness, flexibility, and general well-being.`,
+        location: "HSR Layout",
+        imageUrl: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop",
+      });
+      
+      setIsCreateOpen(false);
+      await fetchAdminClasses();
+    } catch (err: any) {
+      alert(err.message || "Failed to create class");
+    }
   };
 
-  const handleEditSubmit = (data: {
+  const handleEditSubmit = async (data: {
     id: string;
     title: string;
     category: string;
@@ -89,53 +183,59 @@ export default function AdminDashboardPage() {
     date: string;
     capacity: number;
   }) => {
-    setClasses((prev) =>
-      prev.map((cls) => {
-        if (cls.id === data.id) {
-          const booked = cls.capacity - cls.availableSeats;
-          const newAvailable = Math.max(0, data.capacity - booked);
-          return {
-            ...cls,
-            title: data.title,
-            category: data.category,
-            startTime: data.startTime,
-            endTime: data.endTime,
-            date: data.date,
-            capacity: data.capacity,
-            availableSeats: newAvailable,
-          };
-        }
-        return cls;
-      })
-    );
-    setEditingClass(null);
+    try {
+      const startISO = convertToISO(data.date, data.startTime);
+      const endISO = convertToISO(data.date, data.endTime);
+
+      await updateClass(data.id, {
+        title: data.title,
+        category: data.category,
+        startTime: startISO,
+        endTime: endISO,
+        capacity: Number(data.capacity),
+      });
+
+      setEditingClass(null);
+      await fetchAdminClasses();
+    } catch (err: any) {
+      alert(err.message || "Failed to update class");
+    }
   };
 
-  const handleDeleteClass = (id: string) => {
+  const handleDeleteClass = async (id: string) => {
     if (confirm("Are you sure you want to delete this class?")) {
-      setClasses((prev) => prev.filter((cls) => cls.id !== id));
-      const updatedTotalPages = Math.ceil((classes.length - 1) / ITEMS_PER_PAGE);
-      if (currentPage > updatedTotalPages && updatedTotalPages > 0) {
-        setCurrentPage(updatedTotalPages);
+      try {
+        await deleteClass(id);
+        const updatedClasses = classes.filter((cls) => cls.id !== id);
+        const updatedTotalPages = Math.ceil(updatedClasses.length / ITEMS_PER_PAGE);
+        if (currentPage > updatedTotalPages && updatedTotalPages > 0) {
+          setCurrentPage(updatedTotalPages);
+        }
+        await fetchAdminClasses();
+      } catch (err: any) {
+        alert(err.message || "Failed to delete class");
       }
     }
   };
+
+  if (status === "loading" || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F8FA]">
+        <div className="flex flex-col items-center gap-4">
+          <svg className="animate-spin h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          <span className="font-semibold text-text-secondary font-manrope">Loading instructor dashboard...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-full py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold font-sora text-text-primary">Instructor Dashboard</h1>
-        <button
-          onClick={() => {
-            if (confirm("Reset class list to original design mockup values?")) {
-              setClasses(INITIAL_CLASSES);
-              setCurrentPage(1);
-            }
-          }}
-          className="text-xs font-semibold text-text-secondary hover:text-primary transition-colors cursor-pointer font-manrope"
-        >
-          Reset Mocks
-        </button>
       </div>
 
       <Card>

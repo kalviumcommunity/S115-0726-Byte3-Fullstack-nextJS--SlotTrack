@@ -21,14 +21,16 @@ enum BookingStatus {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  password  String
-  role      Role      @default(MEMBER)
-  bookings  Booking[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @default(cuid())
+  name       String
+  email      String    @unique
+  password   String
+  role       Role      @default(MEMBER)
+  employeeId String?   @unique
+  gender     String?
+  bookings   Booking[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model FitnessClass {

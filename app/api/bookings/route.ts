@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { bookingController } from '@/app/controllers/booking.controller';
-import { getAuthenticatedUser } from '@/app/lib/utils';
+import { getAuthenticatedUser } from '@/app/lib/auth-helper';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser(request);
     if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }

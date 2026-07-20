@@ -4,12 +4,19 @@ import { FitnessClass } from '../generated/prisma';
 export const classRepository = {
   // Find all fitness classes matching filters, ordered by startTime ascending
   async findAll(filters?: { category?: string; location?: string }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
-    const where: { category?: string; location?: string } = {};
+    const where: any = {};
     if (filters?.category) {
       where.category = filters.category;
     }
     if (filters?.location) {
-      where.location = filters.location;
+      const loc = filters.location.toLowerCase();
+      if (loc === "bangalore") {
+        where.location = { in: ["Indiranagar", "Koramangala"] };
+      } else if (loc === "mumbai") {
+        where.location = { in: ["Bandra Hub", "Andheri Studio", "Powai Center"] };
+      } else {
+        where.location = { contains: filters.location, mode: "insensitive" };
+      }
     }
 
     return prisma.fitnessClass.findMany({

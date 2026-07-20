@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import BookingDetails from "@/app/components/booking/BookingDetails";
 import BookingWidget from "@/app/components/booking/BookingWidget";
@@ -8,7 +8,8 @@ import AboutClass from "@/app/components/booking/AboutClass";
 import InstructorCard from "@/app/components/cards/InstructorCard";
 import ContactCard from "@/app/components/booking/ContactCard";
 import { useDashboard } from "@/app/(dashboard)/layout";
-import { DASHBOARD_CLASSES } from "@/app/lib/mockData";
+import { getClassById } from "@/app/lib/api/classes";
+import { FitnessClassType } from "@/app/types/fitness-class";
 import Link from "next/link";
 
 interface PageProps {
@@ -18,33 +19,73 @@ interface PageProps {
 export default function DynamicBookingPage({ params }: PageProps) {
   const { id } = use(params);
   const { bookedClassIds, toggleBookClass } = useDashboard();
+  const [currentClass, setCurrentClass] = useState<FitnessClassType | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Find class details
-  const currentClass = DASHBOARD_CLASSES.find((cls) => cls.id === id);
+  useEffect(() => {
+    const fetchClass = async () => {
+      try {
+        const data = await getClassById(id);
+        setCurrentClass(data);
+      } catch (err) {
+        console.error("Failed to load class details", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchClass();
+  }, [id, bookedClassIds]); // Re-fetch on booking update to keep availableSeats in sync
+
+  if (loading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <svg className="animate-spin h-10 w-10 text-[#72BF6A]" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+      </div>
+    );
+  }
 
   if (!currentClass) {
     return (
       <div className="mx-auto w-full max-w-7xl px-4 py-12 text-center">
         <h1 className="text-2xl font-bold mb-4">Class Not Found</h1>
-        <Link href="/dashboard" className="text-primary hover:underline font-bold">
+        <Link href="/dashboard" className="text-[#72BF6A] hover:underline font-bold">
           Return to Dashboard
         </Link>
       </div>
     );
   }
 
-  // Calculate dynamic seats based on global booked status
-  const isInitiallyBooked = id === "class-1" || id === "class-3";
   const isCurrentlyBooked = bookedClassIds.includes(id);
-
-  let currentAvailableSeats = currentClass.availableSeats;
-  if (isInitiallyBooked && !isCurrentlyBooked) {
-    currentAvailableSeats = currentClass.availableSeats + 1;
-  } else if (!isInitiallyBooked && isCurrentlyBooked) {
-    currentAvailableSeats = currentClass.availableSeats - 1;
-  }
-
+  const currentAvailableSeats = currentClass.availableSeats;
   const currentBookedSeats = currentClass.capacity - currentAvailableSeats;
+
+  const start = new Date(currentClass.startTime);
+  const end = new Date(currentClass.endTime);
+
+  const formattedDate = start.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const formatTimeStr = (d: Date) => {
+    return d.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+  const timeStr = `${formatTimeStr(start)} - ${formatTimeStr(end)}`;
+
+  const durationMs = end.getTime() - start.getTime();
+  const durationMinutes = Math.round(durationMs / 60000);
+  const durationStr = `${durationMinutes} Minutes`;
+
+  const imageUrl = currentClass.imageUrl || "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop";
+  const instructorName = currentClass.instructor || "Instructor";
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12 animate-fade-in">
@@ -70,9 +111,9 @@ export default function DynamicBookingPage({ params }: PageProps) {
             <BookingDetails
               title={currentClass.title}
               category={currentClass.category}
-              image={currentClass.image}
-              time={currentClass.time}
-              date={currentClass.date}
+              image={imageUrl}
+              time={timeStr}
+              date={formattedDate}
               location={currentClass.location}
               bookedSeats={currentBookedSeats}
               capacity={currentClass.capacity}
@@ -97,9 +138,9 @@ export default function DynamicBookingPage({ params }: PageProps) {
       <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
         <AboutClass
           description={currentClass.description}
-          duration={currentClass.duration}
-          intensity={currentClass.intensity}
-          equipment={currentClass.equipment}
+          duration={durationStr}
+          intensity="Medium"
+          equipment="Yoga Mat, Towel, Water"
           capacity={currentClass.capacity}
         />
       </div>
@@ -107,10 +148,10 @@ export default function DynamicBookingPage({ params }: PageProps) {
       {/* Instructor Section Card */}
       <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
         <InstructorCard
-          name={currentClass.instructorName}
-          role={currentClass.instructorRole}
-          avatar={currentClass.instructorAvatar}
-          bio={currentClass.instructorBio}
+          name={instructorName}
+          role="Senior Trainer"
+          avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop"
+          bio="Certified fitness professional committed to delivering premium training."
           experience="8+ years Experience"
           certified={true}
         />

@@ -6,6 +6,8 @@ export interface UserType {
   name: string;
   email: string;
   role: Role;
+  employeeId?: string | null;
+  gender?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }

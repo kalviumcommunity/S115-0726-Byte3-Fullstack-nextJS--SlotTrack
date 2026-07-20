@@ -38,8 +38,11 @@ export const userService = {
       throw error;
     }
 
-    // 3. Update user profile name
-    const updatedUser = await userRepository.update(id, { name: validatedData.name });
+    // 3. Update user profile name and gender
+    const updatedUser = await userRepository.update(id, {
+      name: validatedData.name,
+      gender: validatedData.gender,
+    });
 
     const { password: _password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Settings, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Drawer from "../ui/Drawer";
 import ProfileCard from "./ProfileCard";
 import HistoryTable, { HistoryRow } from "../tables/HistoryTable";
@@ -15,6 +16,7 @@ export interface ProfileDrawerProps {
   userContact?: string;
   userGender?: string;
   history: HistoryRow[];
+  onProfileUpdate?: (name: string, gender?: string) => void;
 }
 
 export default function ProfileDrawer({
@@ -25,6 +27,7 @@ export default function ProfileDrawer({
   userContact = "XXXXXXXXXX",
   userGender = "Male",
   history,
+  onProfileUpdate,
 }: ProfileDrawerProps) {
   return (
     <Drawer isOpen={isOpen} onClose={onClose} title="Profile & Account">
@@ -36,6 +39,7 @@ export default function ProfileDrawer({
             age={userAge}
             contact={userContact}
             gender={userGender}
+            onEditToggle={onProfileUpdate}
           />
         </div>
 
@@ -66,7 +70,7 @@ export default function ProfileDrawer({
           <button
             onClick={() => {
               onClose();
-              window.location.href = "/login";
+              signOut({ callbackUrl: "/login" });
             }}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-danger/10 text-danger rounded-input hover:bg-danger/20 transition-all duration-200 font-bold text-sm cursor-pointer"
           >

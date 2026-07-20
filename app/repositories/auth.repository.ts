@@ -8,13 +8,28 @@ export const authRepository = {
     });
   },
 
-  async createUser(data: { name: string; email: string; passwordHash: string }): Promise<User> {
+  async findByEmployeeId(employeeId: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { employeeId },
+    });
+  },
+
+  async createUser(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+    role?: 'MEMBER' | 'ADMIN';
+    employeeId?: string;
+    gender?: string;
+  }): Promise<User> {
     return prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
         password: data.passwordHash,
-        role: 'MEMBER', // Default role
+        role: data.role || 'MEMBER',
+        employeeId: data.employeeId || null,
+        gender: data.gender || null,
       },
     });
   },

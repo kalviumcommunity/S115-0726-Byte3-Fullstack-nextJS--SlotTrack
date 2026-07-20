@@ -3,11 +3,25 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
 import { cn } from "@/app/lib/utils";
+import { useDashboard } from "../../(dashboard)/layout";
 
 const LOCATIONS = ["Pune", "Mumbai", "Bangalore", "Delhi", "Hyderabad", "HSR Layout", "Indiranagar", "Koramangala"];
 
 export default function LocationSelector() {
-  const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]);
+  let selectedLocation = LOCATIONS[0];
+  let setSelectedLocation = (loc: string) => {};
+
+  const [localLoc, setLocalLoc] = useState(LOCATIONS[0]);
+
+  try {
+    const context = useDashboard();
+    selectedLocation = context.selectedLocation;
+    setSelectedLocation = context.setSelectedLocation;
+  } catch (e) {
+    selectedLocation = localLoc;
+    setSelectedLocation = setLocalLoc;
+  }
+
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
