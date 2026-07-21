@@ -39,8 +39,10 @@ export const bookingRepository = {
       include: {
         class: {
           select: {
+            id: true,
             title: true,
             startTime: true,
+            endTime: true,
             location: true
           }
         }
@@ -56,8 +58,10 @@ export const bookingRepository = {
       include: {
         class: {
           select: {
+            id: true,
             title: true,
             startTime: true,
+            endTime: true,
             location: true
           }
         }
@@ -77,8 +81,12 @@ export const bookingRepository = {
         include: {
           class: {
             select: {
+              id: true,
               title: true,
-              startTime: true
+              startTime: true,
+              endTime: true,
+              category: true,
+              location: true
             }
           }
         }

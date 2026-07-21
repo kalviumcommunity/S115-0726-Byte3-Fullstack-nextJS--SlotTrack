@@ -15,6 +15,7 @@ interface DashboardContextType {
   isProfileOpen: boolean;
   setIsProfileOpen: (open: boolean) => void;
   bookedClassIds: string[];
+  bookings: BookingType[];
   toggleBookClass: (id: string) => Promise<void>;
   history: HistoryRow[];
   refreshData: () => Promise<void>;
@@ -51,37 +52,44 @@ export default function DashboardLayout({
     try {
       const activeBookings = await getBookings();
       setBookings(activeBookings);
-      setBookedClassIds(activeBookings.map((b) => b.classId));
+      setBookedClassIds(activeBookings.filter((b) => b.status === "ACTIVE").map((b) => b.classId));
 
       const historyData = await getBookingHistory(1, 20);
-      const mapped = historyData.records.map((b: any) => {
-        const cls = b.class;
-        const start = new Date(cls.startTime);
-        const end = cls.endTime ? new Date(cls.endTime) : null;
-        
-        const formattedDate = start.toLocaleDateString("en-IN", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        });
-
-        const formatTimeStr = (d: Date) => {
-          return d.toLocaleTimeString("en-IN", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
+      const mapped = historyData.records
+        .filter((b: any) => {
+          if (!b.class) return false;
+          if (b.status === "CANCELLED") return true;
+          const start = new Date(b.class.startTime);
+          return start.getTime() <= Date.now();
+        })
+        .map((b: any) => {
+          const cls = b.class;
+          const start = new Date(cls.startTime);
+          const end = cls.endTime ? new Date(cls.endTime) : null;
+          
+          const formattedDate = start.toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
           });
-        };
-        const timeStr = end ? `${formatTimeStr(start)} - ${formatTimeStr(end)}` : formatTimeStr(start);
 
-        return {
-          id: b.id,
-          title: cls.title,
-          category: cls.category || "Class",
-          date: formattedDate,
-          time: timeStr,
-        };
-      });
+          const formatTimeStr = (d: Date) => {
+            return d.toLocaleTimeString("en-IN", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            });
+          };
+          const timeStr = end ? `${formatTimeStr(start)} - ${formatTimeStr(end)}` : formatTimeStr(start);
+
+          return {
+            id: b.id,
+            title: cls.title,
+            category: cls.category || "Class",
+            date: formattedDate,
+            time: timeStr,
+          };
+        });
       setHistory(mapped);
     } catch (err) {
       console.error("Failed to load user bookings/history", err);
@@ -164,6 +172,7 @@ export default function DashboardLayout({
         isProfileOpen,
         setIsProfileOpen,
         bookedClassIds,
+        bookings,
         toggleBookClass,
         history,
         refreshData: fetchData,

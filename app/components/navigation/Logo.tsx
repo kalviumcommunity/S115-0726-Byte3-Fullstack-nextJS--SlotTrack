@@ -1,9 +1,15 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Logo() {
+  const { data: session } = useSession();
+  const href = session ? "/dashboard" : "/";
+
   return (
-    <Link href="/" className="flex items-center gap-3.5 flex-shrink-0 cursor-pointer">
+    <Link href={href} className="flex items-center gap-3.5 flex-shrink-0 cursor-pointer">
       <img
         src="/cure-fit-logo-removebg-preview 1.png"
         alt="Cure.fit Logo"
@@ -18,3 +24,4 @@ export default function Logo() {
     </Link>
   );
 }
+
