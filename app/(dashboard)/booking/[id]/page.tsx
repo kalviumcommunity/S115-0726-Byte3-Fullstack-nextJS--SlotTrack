@@ -89,18 +89,22 @@ export default function DynamicBookingPage({ params }: PageProps) {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12 animate-fade-in">
-      {/* Back Button & Title Area */}
-      <div className="mb-8">
-        <h1 className="font-sans text-3xl font-extrabold tracking-tight text-text-primary mb-3">
-          Booking details
-        </h1>
+      {/* Back Button */}
+      <div className="mb-6">
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors cursor-pointer font-manrope"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Back to Dashboard</span>
+          <span>Back to Booking Page</span>
         </Link>
+      </div>
+
+      {/* Title Area */}
+      <div className="mb-8">
+        <h1 className="font-sans text-3xl font-extrabold tracking-tight text-text-primary">
+          Booking details
+        </h1>
       </div>
 
       {/* Main Details and Booking Widget Card */}
@@ -126,7 +130,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
               classId={currentClass.id}
               availableSeats={currentAvailableSeats}
               capacity={currentClass.capacity}
-              price={299.0}
+              price={currentClass.price}
               onBook={() => toggleBookClass(currentClass.id)}
               isBooked={isCurrentlyBooked}
             />

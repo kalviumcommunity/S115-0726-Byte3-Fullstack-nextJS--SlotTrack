@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, Edit3, Trash2, MoreHorizontal, ArrowRight, Dumbbell, Flame, Flower2, Activity, Sparkles, HelpCircle } from "lucide-react";
+import { Plus, Edit3, Trash2, MoreHorizontal, ArrowRight, ArrowLeft, Dumbbell, Flame, Flower2, Activity, Sparkles, HelpCircle } from "lucide-react";
 import Card from "@/app/components/ui/Card";
 import Button from "@/app/components/ui/Button";
 import Modal from "@/app/components/ui/Modal";
@@ -14,6 +14,7 @@ import { FitnessClass } from "@/app/interfaces/class";
 import { formatDisplayDate } from "@/app/lib/mockData";
 import { cn } from "@/app/lib/utils";
 import { getClasses, createClass, updateClass, deleteClass } from "@/app/lib/api/classes";
+import Link from "next/link";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -62,6 +63,8 @@ const mapDbClassToUI = (cls: any): FitnessClass => {
     date: dateStr,
     capacity: cls.capacity,
     availableSeats: cls.availableSeats,
+    location: cls.location,
+    price: cls.price,
   };
 };
 
@@ -94,6 +97,7 @@ export default function AdminDashboardPage() {
   const [editingClass, setEditingClass] = useState<FitnessClass | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   const fetchAdminClasses = async () => {
     setLoading(true);
@@ -120,21 +124,28 @@ export default function AdminDashboardPage() {
     }
   }, [status, session]);
 
-  const todayStr = useMemo(() => {
-    const start = new Date();
-    const year = start.getFullYear();
-    const month = String(start.getMonth() + 1).padStart(2, "0");
-    const day = String(start.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 5000);
+    return () => clearInterval(timer);
   }, []);
 
-  const todayClasses = useMemo(() => {
-    return classes.filter((cls) => cls.date === todayStr);
-  }, [classes, todayStr]);
+  const scheduleClasses = useMemo(() => {
+    return classes.filter((cls) => {
+      const endTimeDate = new Date(convertToISO(cls.date, cls.endTime));
+      return currentTime < endTimeDate;
+    });
+  }, [classes, currentTime]);
 
   const historyClasses = useMemo(() => {
-    return [...classes].sort((a, b) => b.date.localeCompare(a.date));
-  }, [classes]);
+    return classes
+      .filter((cls) => {
+        const endTimeDate = new Date(convertToISO(cls.date, cls.endTime));
+        return currentTime >= endTimeDate;
+      })
+      .sort((a, b) => b.date.localeCompare(a.date));
+  }, [classes, currentTime]);
 
   const paginatedClasses = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -146,10 +157,12 @@ export default function AdminDashboardPage() {
   const handleCreateSubmit = async (data: {
     title: string;
     category: string;
+    location: string;
     startTime: string;
     endTime: string;
     date: string;
     capacity: number;
+    price: number;
   }) => {
     try {
       const startISO = convertToISO(data.date, data.startTime);
@@ -163,7 +176,8 @@ export default function AdminDashboardPage() {
         capacity: Number(data.capacity),
         instructor: "Senior Instructor",
         description: `Join this premium ${data.title} class to boost your fitness, flexibility, and general well-being.`,
-        location: "HSR Layout",
+        location: data.location,
+        price: data.price,
         imageUrl: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop",
       });
       
@@ -178,10 +192,12 @@ export default function AdminDashboardPage() {
     id: string;
     title: string;
     category: string;
+    location: string;
     startTime: string;
     endTime: string;
     date: string;
     capacity: number;
+    price: number;
   }) => {
     try {
       const startISO = convertToISO(data.date, data.startTime);
@@ -190,9 +206,11 @@ export default function AdminDashboardPage() {
       await updateClass(data.id, {
         title: data.title,
         category: data.category,
+        location: data.location,
         startTime: startISO,
         endTime: endISO,
         capacity: Number(data.capacity),
+        price: data.price,
       });
 
       setEditingClass(null);
@@ -234,6 +252,17 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-full py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col gap-8">
+      {/* Back Button */}
+      <div className="-mb-2">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-text-secondary hover:text-text-primary transition-colors cursor-pointer font-manrope"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          <span>Back to Booking Page</span>
+        </Link>
+      </div>
+
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold font-sora text-text-primary">Instructor Dashboard</h1>
       </div>
@@ -243,7 +272,7 @@ export default function AdminDashboardPage() {
           <div>
             <h2 className="text-2xl font-bold font-sora text-text-primary">Schedule</h2>
             <p className="text-sm font-medium text-text-secondary mt-1 font-manrope">
-              You have created {todayClasses.length} class{todayClasses.length === 1 ? "" : "es"} today.
+              You have {scheduleClasses.length} class{scheduleClasses.length === 1 ? "" : "es"} scheduled.
             </p>
           </div>
           <Button
@@ -255,13 +284,13 @@ export default function AdminDashboardPage() {
           </Button>
         </div>
 
-        {todayClasses.length === 0 ? (
+        {scheduleClasses.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-border rounded-card bg-bg-base/30">
-            <p className="text-text-secondary font-medium font-manrope">No classes scheduled for today.</p>
+            <p className="text-text-secondary font-medium font-manrope">No upcoming classes scheduled.</p>
           </div>
         ) : (
           <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-            {todayClasses.map((cls) => {
+            {scheduleClasses.map((cls) => {
               const booked = cls.capacity - cls.availableSeats;
               return (
                 <div
@@ -297,7 +326,7 @@ export default function AdminDashboardPage() {
                       {cls.startTime} - {cls.endTime}
                     </p>
                     <p className="text-xs font-bold text-text-primary font-manrope">
-                      {booked}/{cls.capacity} Booked
+                      {booked}/{cls.capacity} Booked • ₹{cls.price}
                     </p>
                   </div>
                 </div>
@@ -324,6 +353,7 @@ export default function AdminDashboardPage() {
                 <TableHead>Time</TableHead>
                 <TableHead>Capacity</TableHead>
                 <TableHead>Booked</TableHead>
+                <TableHead>Price</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -352,6 +382,9 @@ export default function AdminDashboardPage() {
                     <TableCell className="font-semibold text-text-secondary font-manrope">
                       {booked}
                     </TableCell>
+                    <TableCell className="font-semibold text-text-primary font-manrope font-semibold">
+                      ₹{cls.price}
+                    </TableCell>
                     <TableCell className="text-right">
                       <ActionMenu
                         onEdit={() => setEditingClass(cls)}
@@ -363,7 +396,7 @@ export default function AdminDashboardPage() {
               })}
               {paginatedClasses.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-text-secondary font-medium font-manrope">
+                  <TableCell colSpan={7} className="text-center py-8 text-text-secondary font-medium font-manrope">
                     No classes found.
                   </TableCell>
                 </TableRow>

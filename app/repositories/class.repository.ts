@@ -11,9 +11,9 @@ export const classRepository = {
     if (filters?.location) {
       const loc = filters.location.toLowerCase();
       if (loc === "bangalore") {
-        where.location = { in: ["Indiranagar", "Koramangala"] };
+        where.location = { in: ["Bangalore", "Indiranagar", "Koramangala"] };
       } else if (loc === "mumbai") {
-        where.location = { in: ["Bandra Hub", "Andheri Studio", "Powai Center"] };
+        where.location = { in: ["Mumbai", "Bandra Hub", "Andheri Studio", "Powai Center"] };
       } else {
         where.location = { contains: filters.location, mode: "insensitive" };
       }
@@ -36,6 +36,7 @@ export const classRepository = {
         endTime: true,
         capacity: true,
         availableSeats: true,
+        price: true,
       },
     });
   },
@@ -59,6 +60,7 @@ export const classRepository = {
     endTime: Date;
     capacity: number;
     availableSeats: number;
+    price: number;
   }): Promise<FitnessClass> {
     return prisma.fitnessClass.create({
       data,
@@ -79,6 +81,7 @@ export const classRepository = {
       endTime?: Date;
       capacity?: number;
       availableSeats?: number;
+      price?: number;
     }
   ): Promise<FitnessClass> {
     return prisma.fitnessClass.update({

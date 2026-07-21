@@ -14,6 +14,7 @@ export interface ClassCardProps {
   time: string;
   date: string;
   location: string;
+  price: number;
   isBooked?: boolean;
   onBookToggle?: (id: string) => void;
 }
@@ -26,6 +27,7 @@ export default function ClassCard({
   time,
   date,
   location,
+  price,
   isBooked = false,
   onBookToggle,
 }: ClassCardProps) {
@@ -54,6 +56,10 @@ export default function ClassCard({
           <h3 className="font-sans font-bold text-xl md:text-2xl text-[#111827] group-hover:text-[#72BF6A] transition-colors leading-tight mb-3">
             {title}
           </h3>
+
+          <div className="text-lg font-extrabold text-[#111827] mb-3">
+            ₹{price}
+          </div>
 
           <div className="space-y-2 text-[#6B7280]">
             {/* Time */}

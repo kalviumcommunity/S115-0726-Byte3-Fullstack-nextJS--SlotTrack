@@ -10,6 +10,7 @@ const createClassSchema = z.object({
   startTime: z.string().datetime({ message: 'Start time must be a valid ISO datetime string' }),
   endTime: z.string().datetime({ message: 'End time must be a valid ISO datetime string' }),
   capacity: z.number().int({ message: 'Capacity must be an integer' }).positive({ message: 'Capacity must be a positive integer' }),
+  price: z.number({ message: 'Price is required' }).positive({ message: 'Price must be greater than 0' }),
 }).refine(data => {
   return new Date(data.startTime) < new Date(data.endTime);
 }, {
@@ -27,6 +28,7 @@ const updateClassSchema = z.object({
   startTime: z.string().datetime({ message: 'Start time must be a valid ISO datetime string' }).optional(),
   endTime: z.string().datetime({ message: 'End time must be a valid ISO datetime string' }).optional(),
   capacity: z.number().int({ message: 'Capacity must be an integer' }).positive({ message: 'Capacity must be a positive integer' }).optional(),
+  price: z.number().positive().optional(),
 }).refine(data => {
   if (data.startTime && data.endTime) {
     return new Date(data.startTime) < new Date(data.endTime);
