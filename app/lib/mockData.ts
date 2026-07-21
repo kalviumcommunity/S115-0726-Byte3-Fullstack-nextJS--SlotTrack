@@ -29,6 +29,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: getTodayDateString(),
     capacity: 20,
     availableSeats: 2, // 18 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "today-2",
@@ -40,6 +42,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: getTodayDateString(),
     capacity: 20,
     availableSeats: 3, // 17 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "today-3",
@@ -51,6 +55,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: getTodayDateString(),
     capacity: 20,
     availableSeats: 2, // 18 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "today-4",
@@ -62,6 +68,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: getTodayDateString(),
     capacity: 20,
     availableSeats: 5, // 15 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "today-5",
@@ -73,6 +81,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: getTodayDateString(),
     capacity: 20,
     availableSeats: 0, // 20 booked
+    location: "HSR Layout",
+    price: 299,
   },
 
   // Class History (Past classes)
@@ -86,6 +96,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-10",
     capacity: 20,
     availableSeats: 1, // 19 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-2",
@@ -97,6 +109,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-10",
     capacity: 25,
     availableSeats: 5, // 20 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-3",
@@ -108,6 +122,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-10",
     capacity: 20,
     availableSeats: 2, // 18 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-4",
@@ -119,6 +135,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-10",
     capacity: 15,
     availableSeats: 0, // 15 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-5",
@@ -130,6 +148,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-09",
     capacity: 20,
     availableSeats: 1, // 19 booked
+    location: "HSR Layout",
+    price: 299,
   },
   
   // Extra history classes for pagination (pages 2 and 3)
@@ -143,6 +163,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-08",
     capacity: 15,
     availableSeats: 3, // 12 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-7",
@@ -154,6 +176,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-08",
     capacity: 20,
     availableSeats: 8, // 12 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-8",
@@ -165,6 +189,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-07",
     capacity: 30,
     availableSeats: 5, // 25 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-9",
@@ -176,6 +202,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-07",
     capacity: 12,
     availableSeats: 0, // 12 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-10",
@@ -187,6 +215,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-06",
     capacity: 20,
     availableSeats: 4, // 16 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-11",
@@ -198,6 +228,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-05",
     capacity: 25,
     availableSeats: 5, // 20 booked
+    location: "HSR Layout",
+    price: 299,
   },
   {
     id: "hist-12",
@@ -209,6 +241,8 @@ export const INITIAL_CLASSES: FitnessClass[] = [
     date: "2026-07-04",
     capacity: 15,
     availableSeats: 2, // 13 booked
+    location: "HSR Layout",
+    price: 299,
   }
 ];
 

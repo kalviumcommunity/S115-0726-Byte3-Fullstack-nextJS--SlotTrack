@@ -5,7 +5,7 @@ import { MapPin, ChevronDown } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { useDashboard } from "../../(dashboard)/layout";
 
-const LOCATIONS = ["Pune", "Mumbai", "Bangalore", "Delhi", "Hyderabad", "HSR Layout", "Indiranagar", "Koramangala"];
+export const LOCATIONS = ["Pune", "Mumbai", "Bangalore", "Delhi", "Hyderabad", "HSR Layout", "Indiranagar", "Koramangala"];
 
 export default function LocationSelector() {
   let selectedLocation = LOCATIONS[0];
