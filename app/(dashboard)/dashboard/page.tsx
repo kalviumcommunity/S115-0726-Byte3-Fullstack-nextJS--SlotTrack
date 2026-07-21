@@ -10,14 +10,17 @@ import { getClasses } from "@/app/lib/api/classes";
 import { FitnessClassType } from "@/app/types/fitness-class";
 
 export default function UserDashboardPage() {
-  const { bookedClassIds, toggleBookClass, selectedLocation } = useDashboard();
+  const { bookedClassIds, bookings, toggleBookClass, selectedLocation } = useDashboard();
   const [classes, setClasses] = useState<FitnessClassType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchClasses = async () => {
-      setLoading(true);
+      // Avoid showing screen-wide loading spinner if classes are already loaded
+      if (classes.length === 0) {
+        setLoading(true);
+      }
       try {
         const data = await getClasses({ location: selectedLocation });
         setClasses(data);
@@ -28,7 +31,7 @@ export default function UserDashboardPage() {
       }
     };
     fetchClasses();
-  }, [selectedLocation]);
+  }, [selectedLocation, bookedClassIds]);
 
   // Combine booking status with our class properties
   const processedClasses: ClassCardProps[] = classes.map((cls) => {
@@ -69,17 +72,6 @@ export default function UserDashboardPage() {
   const filteredClasses = processedClasses.filter(
     (cls) => selectedCategory === "All" || cls.category === selectedCategory
   );
-
-  // Build the list of schedule items for the sidebar based on booking list state
-  const sidebarScheduleItems = processedClasses
-    .filter((cls) => bookedClassIds.includes(cls.id))
-    .map((cls) => ({
-      id: cls.id,
-      title: cls.title,
-      time: cls.time,
-      location: cls.location,
-      status: "booked" as const,
-    }));
 
   return (
     <div className="space-y-6">
@@ -127,7 +119,7 @@ export default function UserDashboardPage() {
         {/* Right Fixed Section: Today's Schedule Sidebar */}
         <div className="lg:col-span-4 lg:sticky lg:top-[112px]">
           <ScheduleSidebar
-            scheduleItems={sidebarScheduleItems}
+            bookings={bookings}
             onCancelBooking={toggleBookClass}
           />
         </div>
