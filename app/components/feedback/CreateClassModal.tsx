@@ -10,10 +10,12 @@ interface CreateClassModalProps {
   onSubmit: (data: {
     title: string;
     category: string;
+    location: string;
     startTime: string;
     endTime: string;
     date: string;
     capacity: number;
+    price: number;
   }) => void;
 }
 

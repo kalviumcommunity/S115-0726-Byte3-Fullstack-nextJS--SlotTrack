@@ -11,6 +11,7 @@ export interface FitnessClassType {
   endTime: Date;
   capacity: number;
   availableSeats: number;
+  price: number;
   createdAt: Date;
   updatedAt: Date;
 }

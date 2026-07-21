@@ -47,6 +47,7 @@ export const classService = {
       endTime,
       capacity,
       availableSeats: capacity,
+      price: validated.price,
     };
 
     return classRepository.create(classData);
@@ -84,6 +85,7 @@ export const classService = {
       endTime?: Date;
       capacity?: number;
       availableSeats?: number;
+      price?: number;
     } = {};
     if (validated.title !== undefined) updateData.title = validated.title;
     if (validated.description !== undefined) updateData.description = validated.description;
@@ -91,6 +93,7 @@ export const classService = {
     if (validated.category !== undefined) updateData.category = validated.category;
     if (validated.imageUrl !== undefined) updateData.imageUrl = validated.imageUrl;
     if (validated.location !== undefined) updateData.location = validated.location;
+    if (validated.price !== undefined) updateData.price = validated.price;
 
     // Check date bounds
     const startTime = validated.startTime ? new Date(validated.startTime) : existingClass.startTime;

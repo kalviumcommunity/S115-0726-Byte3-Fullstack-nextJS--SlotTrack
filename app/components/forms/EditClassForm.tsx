@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import { FitnessClass } from "../../interfaces/class";
+import { LOCATIONS } from "../navigation/LocationSelector";
 
 interface EditClassFormProps {
   initialClass: FitnessClass;
@@ -11,10 +12,12 @@ interface EditClassFormProps {
     id: string;
     title: string;
     category: string;
+    location: string;
     startTime: string;
     endTime: string;
     date: string;
     capacity: number;
+    price: number;
   }) => void;
   onCancel: () => void;
 }
@@ -42,19 +45,29 @@ const convert12hrTo24hr = (time12h: string) => {
 export default function EditClassForm({ initialClass, onSubmit, onCancel }: EditClassFormProps) {
   const [title, setTitle] = useState(initialClass.title);
   const [category, setCategory] = useState(initialClass.category);
+  const [location, setLocation] = useState(initialClass.location || LOCATIONS[0]);
   const [date, setDate] = useState(initialClass.date);
   const [startTime, setStartTime] = useState(() => convert12hrTo24hr(initialClass.startTime));
   const [endTime, setEndTime] = useState(() => convert12hrTo24hr(initialClass.endTime));
   const [capacity, setCapacity] = useState(initialClass.capacity);
+  const [price, setPrice] = useState(() => String(initialClass.price || "0"));
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
     if (!title.trim()) newErrors.title = "Class name is required";
+    if (!location) newErrors.location = "Location is required";
     if (!date) newErrors.date = "Date is required";
     if (!startTime) newErrors.startTime = "Start time is required";
     if (!endTime) newErrors.endTime = "End time is required";
     if (capacity <= 0) newErrors.capacity = "Capacity must be greater than 0";
+
+    const parsedPrice = parseFloat(price);
+    if (!price.trim()) {
+      newErrors.price = "Price is required";
+    } else if (isNaN(parsedPrice) || parsedPrice <= 0) {
+      newErrors.price = "Price must be greater than 0";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -78,10 +91,12 @@ export default function EditClassForm({ initialClass, onSubmit, onCancel }: Edit
       id: initialClass.id,
       title,
       category,
+      location,
       date,
       startTime: formatTime12hr(startTime),
       endTime: formatTime12hr(endTime),
       capacity,
+      price: parseFloat(price),
     });
   };
 
@@ -113,6 +128,25 @@ export default function EditClassForm({ initialClass, onSubmit, onCancel }: Edit
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="flex flex-col gap-1.5 w-full">
+        <label htmlFor="edit-class-location" className="text-sm font-semibold text-text-primary">
+          Location
+        </label>
+        <select
+          id="edit-class-location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full h-11 px-3.5 bg-surface border border-border rounded-input text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm font-manrope cursor-pointer"
+        >
+          {LOCATIONS.map((loc) => (
+            <option key={loc} value={loc}>
+              {loc}
+            </option>
+          ))}
+        </select>
+        {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
       </div>
 
       <Input
@@ -156,6 +190,25 @@ export default function EditClassForm({ initialClass, onSubmit, onCancel }: Edit
         error={errors.capacity}
         required
       />
+
+      <div className="relative">
+        <Input
+          label="Price"
+          id="edit-class-price"
+          type="number"
+          step="0.01"
+          min="0.01"
+          placeholder="e.g. 299.00"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          className="pl-8"
+          error={errors.price}
+          required
+        />
+        <span className="absolute left-3.5 top-[38px] text-sm font-semibold text-text-secondary select-none">
+          ₹
+        </span>
+      </div>
 
       <div className="flex items-center justify-end gap-3 mt-4 border-t border-border pt-4">
         <Button type="button" variant="secondary" onClick={onCancel} className="cursor-pointer">

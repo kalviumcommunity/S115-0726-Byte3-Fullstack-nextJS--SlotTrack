@@ -61,6 +61,7 @@ export default function UserDashboardPage() {
       date: formattedDate,
       time: timeStr,
       location: cls.location,
+      price: cls.price,
       isBooked: bookedClassIds.includes(cls.id),
     };
   });
