@@ -17,6 +17,7 @@ export interface ProfileDrawerProps {
   userGender?: string;
   history: HistoryRow[];
   onProfileUpdate?: (name: string, age?: number, gender?: string) => void;
+  role?: string;
 }
 
 export default function ProfileDrawer({
@@ -28,7 +29,10 @@ export default function ProfileDrawer({
   userGender = "Male",
   history,
   onProfileUpdate,
+  role = "MEMBER",
 }: ProfileDrawerProps) {
+  const isInstructorOrAdmin = role === "ADMIN" || role === "INSTRUCTOR";
+
   return (
     <Drawer isOpen={isOpen} onClose={onClose} title="Profile & Account">
       <div className="space-y-8 pb-10 flex flex-col h-full">
@@ -59,14 +63,16 @@ export default function ProfileDrawer({
 
         {/* Account Actions Section */}
         <div className="pt-6 border-t border-border flex flex-col sm:flex-row gap-4">
-          <Link
-            href="/admin"
-            onClick={onClose}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-surface border border-border text-text-primary rounded-input hover:bg-bg-base transition-all duration-200 font-bold text-sm"
-          >
-            <Settings className="size-4 text-text-secondary" />
-            <span>Instructor Panel</span>
-          </Link>
+          {isInstructorOrAdmin && (
+            <Link
+              href="/admin"
+              onClick={onClose}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-surface border border-border text-text-primary rounded-input hover:bg-bg-base transition-all duration-200 font-bold text-sm"
+            >
+              <Settings className="size-4 text-text-secondary" />
+              <span>Instructor Panel</span>
+            </Link>
+          )}
           <button
             onClick={() => {
               onClose();
