@@ -74,15 +74,21 @@ export default function DashboardLayout({
       setBookedClassIds(activeBookings.filter((b) => b.status === "ACTIVE").map((b) => b.classId));
 
       const historyData = await getBookingHistory(1, 20);
-      const mapped = historyData.records
+      const records = historyData?.records || [];
+      const mapped = records
         .filter((b: any) => {
-          if (!b.class) return false;
-          if (b.status === "CANCELLED") return true;
-          const start = new Date(b.class.startTime);
-          return start.getTime() <= Date.now();
+          if (b.class) {
+            if (b.status === "CANCELLED") return true;
+            const start = new Date(b.class.startTime);
+            return start.getTime() <= Date.now();
+          } else if (b.startTime) {
+            const start = new Date(b.startTime);
+            return start.getTime() <= Date.now();
+          }
+          return false;
         })
         .map((b: any) => {
-          const cls = b.class;
+          const cls = b.class || b;
           const start = new Date(cls.startTime);
           const end = cls.endTime ? new Date(cls.endTime) : null;
           

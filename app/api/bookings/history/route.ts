@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const page = searchParams.get('page');
     const limit = searchParams.get('limit');
 
-    const result = await bookingController.getHistory(user.userId, { page, limit });
+    const result = await bookingController.getHistory(user.userId, user.role, { page, limit });
     return NextResponse.json({ success: true, data: result });
   } catch (error: any) {
     const statusCode = error.statusCode || 500;

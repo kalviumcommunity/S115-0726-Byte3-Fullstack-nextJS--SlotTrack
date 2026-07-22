@@ -69,15 +69,16 @@ export default function ScheduleSidebar({
     return fmt(start);
   };
 
-  const now = new Date();
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
 
-  // 1. Filter: ACTIVE, class exists, startTime is in the future/present relative to current time
+  // 1. Filter: ACTIVE, class exists, startTime is today or in the future
   const activeUpcoming = bookings.filter((booking) => {
     if (booking.status !== "ACTIVE" || !booking.class) {
       return false;
     }
     const classStart = new Date(booking.class.startTime);
-    return classStart.getTime() > now.getTime();
+    return classStart.getTime() >= startOfToday.getTime();
   });
 
   // 2. Deduplicate: Ensure each scheduled class appears only ONCE by classId
@@ -142,21 +143,31 @@ export default function ScheduleSidebar({
           totalUpcomingCount === 0 ? "justify-center" : "justify-start"
         }`}>
           {totalUpcomingCount > 0 ? (
-            <div className="space-y-4 w-full">
+            <div className="space-y-5 w-full">
               {sortedGroups.map((group) => (
-                <div key={group.label} className="space-y-1">
+                <div key={group.label} className="space-y-2.5">
+                  {/* Day Divider & Header with Date */}
+                  <div className="flex items-center gap-3 pt-1">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#72BF6A] bg-[#72BF6A]/10 px-3 py-1 rounded-full shrink-0">
+                      {group.label}
+                    </span>
+                    <div className="h-[1px] flex-1 bg-gray-200" />
+                  </div>
+
                   {/* Items of the day */}
-                  {group.items.map((booking) => (
-                    <ScheduleItem
-                      key={booking.classId || booking.id}
-                      id={booking.classId} // Pass classId for cancel action
-                      title={booking.class.title}
-                      time={formatTimeStr(booking.class.startTime, booking.class.endTime)}
-                      location={booking.class.location}
-                      status="booked"
-                      onCancel={onCancelBooking}
-                    />
-                  ))}
+                  <div className="space-y-2">
+                    {group.items.map((booking) => (
+                      <ScheduleItem
+                        key={booking.classId || booking.id}
+                        id={booking.classId} // Pass classId for cancel action
+                        title={booking.class.title}
+                        time={formatTimeStr(booking.class.startTime, booking.class.endTime)}
+                        location={booking.class.location}
+                        status="booked"
+                        onCancel={onCancelBooking}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
