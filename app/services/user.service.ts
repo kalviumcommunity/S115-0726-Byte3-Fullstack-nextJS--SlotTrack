@@ -2,14 +2,18 @@ import { userRepository } from '../repositories/user.repository';
 import { userValidator } from '../validators/user.validator';
 
 export const userService = {
-  async getProfile(id: string): Promise<unknown> {
-    if (!id) {
+  async getProfile(id: string, email?: string): Promise<unknown> {
+    if (!id && !email) {
       const error = new Error('Unauthorized') as Error & { status?: number };
       error.status = 401;
       throw error;
     }
 
-    const user = await userRepository.findById(id);
+    let user = id ? await userRepository.findById(id) : null;
+    if (!user && email) {
+      user = await userRepository.findByEmail(email);
+    }
+
     if (!user) {
       const error = new Error('User not found') as Error & { status?: number };
       error.status = 404;

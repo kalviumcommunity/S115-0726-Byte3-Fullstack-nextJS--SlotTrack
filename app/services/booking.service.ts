@@ -41,12 +41,17 @@ export const bookingService = {
     }
   },
 
-  // Implement getting paginated booking history for a user
-  async getHistory(userId: string, query: { page: number; limit: number }): Promise<any> {
+  // Implement getting paginated booking history for a user/admin
+  async getHistory(userId: string, role: Role, query: { page: number; limit: number }): Promise<any> {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
 
-    const [records, total] = await bookingRepository.findByUserIdPaginated(userId, skip, limit);
+    let records: any[], total: number;
+    if (role === Role.ADMIN) {
+      [records, total] = await bookingRepository.findPastClassesPaginated(skip, limit);
+    } else {
+      [records, total] = await bookingRepository.findByUserIdPaginated(userId, skip, limit);
+    }
 
     return {
       records,

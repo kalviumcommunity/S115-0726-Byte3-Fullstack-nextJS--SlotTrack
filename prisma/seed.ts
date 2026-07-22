@@ -28,73 +28,75 @@ function getEndDate(startDate: Date, durationMinutes: number): Date {
 
 async function seedUsers(hashedPassword: string) {
   console.log('Seeding users...');
-  
+
   const usersToSeed = [
+    // 2 Admin Users
     {
-      id: 'user-admin',
-      email: 'admin@slottrack.com',
-      name: 'Admin User',
+      id: 'user-admin-1',
+      email: 'admin1@slottrack.com',
+      name: 'Admin User 1',
       role: Role.ADMIN,
+      employeeId: 'EMP-001',
+      gender: 'Male',
+      age: 32,
     },
     {
+      id: 'user-admin-2',
+      email: 'admin2@slottrack.com',
+      name: 'Admin User 2',
+      role: Role.ADMIN,
+      employeeId: 'EMP-002',
+      gender: 'Female',
+      age: 29,
+    },
+    // 6 Member Users
+    {
       id: 'user-member-1',
-      email: 'john.doe@slottrack.com',
-      name: 'John Doe',
+      email: 'aarav.sharma@slottrack.com',
+      name: 'Aarav Sharma',
       role: Role.MEMBER,
+      gender: 'Male',
+      age: 26,
     },
     {
       id: 'user-member-2',
-      email: 'jane.doe@slottrack.com',
-      name: 'Jane Doe',
+      email: 'priya.patel@slottrack.com',
+      name: 'Priya Patel',
       role: Role.MEMBER,
+      gender: 'Female',
+      age: 24,
     },
     {
       id: 'user-member-3',
-      email: 'bob.smith@slottrack.com',
-      name: 'Bob Smith',
+      email: 'rahul.verma@slottrack.com',
+      name: 'Rahul Verma',
       role: Role.MEMBER,
+      gender: 'Male',
+      age: 30,
     },
     {
       id: 'user-member-4',
-      email: 'alice.johnson@slottrack.com',
-      name: 'Alice Johnson',
+      email: 'neha.gupta@slottrack.com',
+      name: 'Neha Gupta',
       role: Role.MEMBER,
+      gender: 'Female',
+      age: 27,
     },
     {
       id: 'user-member-5',
-      email: 'charlie.brown@slottrack.com',
-      name: 'Charlie Brown',
+      email: 'rohan.singh@slottrack.com',
+      name: 'Rohan Singh',
       role: Role.MEMBER,
+      gender: 'Male',
+      age: 28,
     },
     {
       id: 'user-member-6',
-      email: 'david.miller@slottrack.com',
-      name: 'David Miller',
+      email: 'sneha.joshi@slottrack.com',
+      name: 'Sneha Joshi',
       role: Role.MEMBER,
-    },
-    {
-      id: 'user-member-7',
-      email: 'emily.davis@slottrack.com',
-      name: 'Emily Davis',
-      role: Role.MEMBER,
-    },
-    {
-      id: 'user-member-8',
-      email: 'frank.wilson@slottrack.com',
-      name: 'Frank Wilson',
-      role: Role.MEMBER,
-    },
-    {
-      id: 'user-member-9',
-      email: 'grace.taylor@slottrack.com',
-      name: 'Grace Taylor',
-      role: Role.MEMBER,
-    },
-    {
-      id: 'user-member-10',
-      email: 'henry.jones@slottrack.com',
-      name: 'Henry Jones',
-      role: Role.MEMBER,
+      gender: 'Female',
+      age: 25,
     },
   ];
 
@@ -106,6 +108,9 @@ async function seedUsers(hashedPassword: string) {
         name: user.name,
         password: hashedPassword,
         role: user.role,
+        employeeId: user.employeeId || null,
+        gender: user.gender || null,
+        age: user.age || null,
       },
       create: {
         id: user.id,
@@ -113,331 +118,166 @@ async function seedUsers(hashedPassword: string) {
         name: user.name,
         password: hashedPassword,
         role: user.role,
+        employeeId: user.employeeId || null,
+        gender: user.gender || null,
+        age: user.age || null,
       },
     });
     upsertedUsers.push(upserted);
   }
-  
-  console.log(`Successfully seeded ${upsertedUsers.length} users.`);
+
+  console.log(`Successfully seeded ${upsertedUsers.length} users (2 Admins, 6 Members).`);
   return upsertedUsers;
 }
 
-async function seedClasses() {
-  console.log('Seeding fitness classes...');
+async function seedPastClasses() {
+  console.log('Seeding past fitness classes (historical data)...');
 
-  const classesToSeed = [
-    // 1. Yoga (Past)
+  const pastClassesToSeed = [
     {
-      id: 'class-yoga-1',
-      title: 'Morning Vinyasa Flow',
-      description: 'Start your day with an energizing Vinyasa flow linking movement with breath. Suitable for all levels.',
-      instructor: 'Sarah Jenkins',
+      id: 'class-past-1',
+      title: 'Sunrise Vinyasa Yoga',
+      description: 'Energizing morning vinyasa flow focusing on core alignment and deep breathing.',
+      instructor: 'Vikram Malhotra',
       category: 'Yoga',
       imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop',
-      location: 'Bandra Hub',
-      capacity: 12,
-      daysOffset: -2,
+      location: 'Bandra Hub, Mumbai',
+      price: 599,
+      capacity: 20,
+      daysOffset: -5,
       startHour: 7,
       durationMinutes: 60,
     },
-    // 2. HIIT (Past)
     {
-      id: 'class-hiit-1',
-      title: 'Full Body Burn',
-      description: 'High-intensity interval training designed to push your limits, burn fat, and build cardiovascular endurance.',
-      instructor: 'Mike Johnson',
+      id: 'class-past-2',
+      title: 'Metabolic HIIT Burn',
+      description: 'High-intensity interval training session designed for fat burn and stamina.',
+      instructor: 'Priya Sharma',
       category: 'HIIT',
       imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-      location: 'Andheri Studio',
-      capacity: 15,
-      daysOffset: -2,
+      location: 'Baner Studio, Pune',
+      price: 799,
+      capacity: 25,
+      daysOffset: -5,
+      startHour: 17,
+      durationMinutes: 45,
+    },
+    {
+      id: 'class-past-3',
+      title: 'Barbell Strength & Form',
+      description: 'Technique-driven barbell lifting session focusing on squats and deadlifts.',
+      instructor: 'Arjun Kapoor',
+      category: 'Strength',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Koramangala Studio, Bangalore',
+      price: 899,
+      capacity: 20,
+      daysOffset: -4,
       startHour: 9,
       durationMinutes: 60,
     },
-    // 3. Strength (Past)
     {
-      id: 'class-strength-1',
-      title: 'Barbell Strength',
-      description: 'Focus on compound lifts including squats, deadlifts, and presses. Build maximum strength and improve form.',
-      instructor: 'David Smith',
-      category: 'Strength',
-      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-      location: 'Powai Center',
-      capacity: 25,
-      daysOffset: -1,
-      startHour: 18,
-      durationMinutes: 60,
-    },
-    // 4. Pilates (Past)
-    {
-      id: 'class-pilates-1',
-      title: 'Core Sculpt Pilates',
-      description: 'A low-impact, high-intensity workout focusing on core strength, muscle toning, and postural alignment.',
-      instructor: 'Emma Wilson',
+      id: 'class-past-4',
+      title: 'Core Mat Pilates',
+      description: 'Low-impact core strengthening and posture realignment Pilates class.',
+      instructor: 'Neha Gupta',
       category: 'Pilates',
       imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop',
-      location: 'Indiranagar',
-      capacity: 16,
-      daysOffset: -1,
-      startHour: 8,
-      durationMinutes: 60,
-    },
-    // 5. Cardio (Today)
-    {
-      id: 'class-cardio-1',
-      title: 'Aerobic Endurance',
-      description: 'Boost your heart health with this dynamic aerobic workout. Perfect for building stamina.',
-      instructor: 'James Taylor',
-      category: 'Cardio',
-      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
-      location: 'Hadapsar, Pune',
-      capacity: 30,
-      daysOffset: 0,
-      startHour: 7,
-      durationMinutes: 60,
-    },
-    // 6. Dance Fitness (Today)
-    {
-      id: 'class-dance-1',
-      title: 'Dance Cardio Jam',
-      description: 'An upbeat dance fitness class featuring hip-hop and pop rhythms. Burn calories while having fun!',
-      instructor: 'Jessica Davis',
-      category: 'Dance Fitness',
-      imageUrl: 'https://images.unsplash.com/photo-1524594152303-9fd13543dd6e?q=80&w=800&auto=format&fit=crop',
-      location: 'Bandra Hub',
-      capacity: 35,
-      daysOffset: 0,
-      startHour: 10,
-      durationMinutes: 60,
-    },
-    // 7. Functional Training (Today)
-    {
-      id: 'class-functional-1',
-      title: 'Functional Circuit',
-      description: 'Circuit training designed to improve everyday movement patterns, agility, and overall fitness.',
-      instructor: 'Robert Clark',
-      category: 'Functional Training',
-      imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop',
-      location: 'Hadapsar, Pune',
-      capacity: 20,
-      daysOffset: 0,
-      startHour: 17,
-      durationMinutes: 90,
-    },
-    // 8. Zumba (Today)
-    {
-      id: 'class-zumba-1',
-      title: 'Latin Zumba Dance',
-      description: 'Latin-inspired dance workout that is friendly, energetic, and highly engaging for all levels.',
-      instructor: 'Linda Martinez',
-      category: 'Zumba',
-      imageUrl: 'https://images.unsplash.com/photo-1524594152303-9fd13543dd6e?q=80&w=800&auto=format&fit=crop',
-      location: 'Andheri Studio',
-      capacity: 40,
-      daysOffset: 0,
+      location: 'Connaught Place, Delhi',
+      price: 699,
+      capacity: 18,
+      daysOffset: -4,
       startHour: 19,
       durationMinutes: 60,
     },
-    // 9. CrossFit (Tomorrow - Completely Full)
     {
-      id: 'class-crossfit-1',
-      title: 'WOD: Power & Grace',
-      description: 'CrossFit Workout of the Day focusing on Olympic lifting, gymnastics, and high-intensity conditioning.',
-      instructor: 'William Brown',
-      category: 'CrossFit',
-      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-      location: 'Indiranagar',
-      capacity: 10,
-      daysOffset: 1,
-      startHour: 6,
-      durationMinutes: 60,
-    },
-    // 10. Cycling (Tomorrow)
-    {
-      id: 'class-cycling-1',
-      title: 'Rhythm Spin Class',
-      description: 'High-energy indoor cycling class synced to high-tempo beats. Get ready to climb, sprint, and sweat.',
-      instructor: 'Patricia Lee',
-      category: 'Cycling',
-      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
-      location: 'Hadapsar, Pune',
-      capacity: 25,
-      daysOffset: 1,
-      startHour: 8,
-      durationMinutes: 45,
-    },
-    // 11. Yoga (Tomorrow)
-    {
-      id: 'class-yoga-2',
-      title: 'Hatha & Yin Restore',
-      description: 'Deep stretching and long holds to release tension and calm the nervous system. Ideal for relaxation.',
-      instructor: 'Sarah Jenkins',
-      category: 'Yoga',
-      imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop',
-      location: 'Powai Center',
-      capacity: 20,
-      daysOffset: 1,
-      startHour: 18,
-      durationMinutes: 75,
-    },
-    // 12. Strength (Future)
-    {
-      id: 'class-strength-2',
-      title: 'Hypertrophy Upper Body',
-      description: 'Focus on high-volume training targeting chest, back, shoulders, and arms to build definition.',
-      instructor: 'David Smith',
-      category: 'Strength',
-      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-      location: 'Hadapsar, Pune',
-      capacity: 25,
-      daysOffset: 2,
+      id: 'class-past-5',
+      title: 'Bollywood Dance Fitness',
+      description: 'Fun cardio dance workout set to high-energy Bollywood tracks.',
+      instructor: 'Rajesh Varma',
+      category: 'Dance Fitness',
+      imageUrl: 'https://images.unsplash.com/photo-1524594152303-9fd13543dd6e?q=80&w=800&auto=format&fit=crop',
+      location: 'Jubilee Hills, Hyderabad',
+      price: 699,
+      capacity: 30,
+      daysOffset: -3,
       startHour: 11,
       durationMinutes: 60,
     },
-    // 13. HIIT (Future - Almost Full)
     {
-      id: 'class-hiit-2',
-      title: 'Tabata Protocol',
-      description: '4-minute interval rounds consisting of 20 seconds of intense work and 10 seconds of rest.',
-      instructor: 'Mike Johnson',
-      category: 'HIIT',
+      id: 'class-past-6',
+      title: 'Cardio Endurance Spin',
+      description: 'Cadence and hill-climb cycling workout for cardiovascular fitness.',
+      instructor: 'Divya Nair',
+      category: 'Cycling',
       imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
-      location: 'Andheri Studio',
-      capacity: 12,
-      daysOffset: 2,
-      startHour: 16,
+      location: 'Andheri Fitness Center, Mumbai',
+      price: 799,
+      capacity: 20,
+      daysOffset: -3,
+      startHour: 17,
       durationMinutes: 45,
     },
-    // 14. Pilates (Future - Completely Full)
     {
-      id: 'class-pilates-2',
-      title: 'Power Reformer & Mat',
-      description: 'Advanced Pilates session integrating classic mat sequences with resistance training.',
-      instructor: 'Emma Wilson',
-      category: 'Pilates',
-      imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop',
-      location: 'Indiranagar',
-      capacity: 8,
-      daysOffset: 2,
-      startHour: 9,
-      durationMinutes: 60,
-    },
-    // 15. CrossFit (Future)
-    {
-      id: 'class-crossfit-2',
-      title: 'CrossFit Hero WOD',
-      description: 'A challenging, endurance-focused Hero workout to build stamina, mental toughness, and strength.',
-      instructor: 'William Brown',
+      id: 'class-past-7',
+      title: 'CrossFit WOD Express',
+      description: 'Challenging Workout of the Day combining Olympic lifting and metabolic conditioning.',
+      instructor: 'Kabir Mehta',
       category: 'CrossFit',
       imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-      location: 'Bandra Hub',
+      location: 'Koregaon Park, Pune',
+      price: 999,
       capacity: 15,
-      daysOffset: 3,
+      daysOffset: -2,
       startHour: 7,
       durationMinutes: 60,
     },
-    // 16. Cycling (Future)
     {
-      id: 'class-cycling-2',
-      title: 'FTP Climb Session',
-      description: 'A cycling class focusing on power zones, resistance climbing, and metric tracking.',
-      instructor: 'Patricia Lee',
-      category: 'Cycling',
-      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
-      location: 'Koramangala',
-      capacity: 20,
-      daysOffset: 3,
-      startHour: 18,
-      durationMinutes: 60,
-    },
-    // 17. Yoga (Future)
-    {
-      id: 'class-yoga-3',
-      title: 'Ashtanga Primary Series',
-      description: 'A structured sequence of postures designed to purify, strengthen, and align the body.',
-      instructor: 'Sarah Jenkins',
-      category: 'Yoga',
-      imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop',
-      location: 'Andheri Studio',
-      capacity: 20,
-      daysOffset: 3,
-      startHour: 8,
-      durationMinutes: 90,
-    },
-    // 18. Cardio (Future)
-    {
-      id: 'class-cardio-2',
-      title: 'Cardio Kickboxing',
-      description: 'Kick, punch, and sweat your way through this high-energy combat-inspired cardio session.',
-      instructor: 'James Taylor',
-      category: 'Cardio',
-      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
-      location: 'Powai Center',
-      capacity: 30,
-      daysOffset: 4,
-      startHour: 19,
-      durationMinutes: 60,
-    },
-    // 19. Functional Training (Future)
-    {
-      id: 'class-functional-2',
-      title: 'Core & Balance Circuit',
-      description: 'Improve balance, coordination, and stabilizing muscles with targeted functional exercises.',
-      instructor: 'Robert Clark',
+      id: 'class-past-8',
+      title: 'Functional Circuit Training',
+      description: 'Dynamic bodyweight and kettlebell circuit to enhance everyday functional movement.',
+      instructor: 'Ananya Sen',
       category: 'Functional Training',
       imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop',
-      location: 'Indiranagar',
-      capacity: 20,
-      daysOffset: 4,
-      startHour: 10,
-      durationMinutes: 60,
+      location: 'HSR Layout Center, Bangalore',
+      price: 899,
+      capacity: 25,
+      daysOffset: -2,
+      startHour: 19,
+      durationMinutes: 75,
     },
-    // 20. Zumba (Future)
     {
-      id: 'class-zumba-2',
-      title: 'Aqua Zumba Splash',
-      description: 'A water-based dance-fitness party combining Zumba formula with low-impact pool resistance.',
-      instructor: 'Linda Martinez',
-      category: 'Zumba',
-      imageUrl: 'https://images.unsplash.com/photo-1524594152303-9fd13543dd6e?q=80&w=800&auto=format&fit=crop',
-      location: 'Bandra Hub',
-      capacity: 30,
-      daysOffset: 4,
-      startHour: 12,
-      durationMinutes: 60,
-    },
-    // 21. Strength (Future)
-    {
-      id: 'class-strength-3',
-      title: 'Powerlifting Essentials',
-      description: 'In-depth session focusing on technique, progression, and safety in Bench Press, Squat, and Deadlift.',
-      instructor: 'David Smith',
-      category: 'Strength',
-      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
-      location: 'Powai Center',
+      id: 'class-past-9',
+      title: 'Full Body Mobility Reset',
+      description: 'Targeted mobility and fascia release class for joint health and tension relief.',
+      instructor: 'Vikram Malhotra',
+      category: 'Mobility',
+      imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop',
+      location: 'Indiranagar Center, Bangalore',
+      price: 599,
       capacity: 20,
-      daysOffset: 5,
-      startHour: 17,
-      durationMinutes: 90,
-    },
-    // 22. HIIT (Future)
-    {
-      id: 'class-hiit-3',
-      title: 'Metabolic Conditioning',
-      description: 'A fast-paced workout combining bodyweight, dumbbells, and cardio intervals to maximize calorie burn.',
-      instructor: 'Mike Johnson',
-      category: 'HIIT',
-      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
-      location: 'Andheri Studio',
-      capacity: 20,
-      daysOffset: 5,
+      daysOffset: -1,
       startHour: 9,
       durationMinutes: 60,
     },
+    {
+      id: 'class-past-10',
+      title: 'Core & Abs Sculpt',
+      description: 'Intense abdominal core session building midsection stability and rotational strength.',
+      instructor: 'Priya Sharma',
+      category: 'Core Training',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'Powai Studio, Mumbai',
+      price: 499,
+      capacity: 22,
+      daysOffset: -1,
+      startHour: 17,
+      durationMinutes: 45,
+    },
   ];
 
-  const upsertedClasses = [];
-  for (const item of classesToSeed) {
+  const upsertedPastClasses = [];
+  for (const item of pastClassesToSeed) {
     const startTime = getRelativeDate(item.daysOffset, item.startHour);
     const endTime = getEndDate(startTime, item.durationMinutes);
 
@@ -450,6 +290,7 @@ async function seedClasses() {
         category: item.category,
         imageUrl: item.imageUrl,
         location: item.location,
+        price: item.price,
         startTime,
         endTime,
         capacity: item.capacity,
@@ -462,90 +303,553 @@ async function seedClasses() {
         category: item.category,
         imageUrl: item.imageUrl,
         location: item.location,
+        price: item.price,
         startTime,
         endTime,
         capacity: item.capacity,
-        availableSeats: item.capacity, // initially set to capacity
+        availableSeats: item.capacity,
       },
     });
-    upsertedClasses.push(upserted);
+    upsertedPastClasses.push(upserted);
   }
 
-  console.log(`Successfully seeded ${upsertedClasses.length} fitness classes.`);
-  return upsertedClasses;
+  console.log(`Successfully seeded ${upsertedPastClasses.length} past fitness classes.`);
+  return upsertedPastClasses;
+}
+
+async function seedFutureClasses() {
+  console.log('Seeding upcoming fitness classes (today + 7 days)...');
+
+  const futureClassesToSeed = [
+    // Today (Day 0)
+    {
+      id: 'class-upcoming-1',
+      title: 'Power Vinyasa Flow',
+      description: 'Vigorous flow connecting breath with dynamic strength postures.',
+      instructor: 'Vikram Malhotra',
+      category: 'Yoga',
+      imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop',
+      location: 'Koregaon Park, Pune',
+      price: 699,
+      capacity: 20,
+      daysOffset: 0,
+      startHour: 7,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-2',
+      title: 'High-Intensity Shred',
+      description: 'Fast-paced calorie burning HIIT workout with plyometrics and weights.',
+      instructor: 'Priya Sharma',
+      category: 'HIIT',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Viman Nagar, Pune',
+      price: 799,
+      capacity: 25,
+      daysOffset: 0,
+      startHour: 11,
+      durationMinutes: 45,
+    },
+    {
+      id: 'class-upcoming-3',
+      title: 'Heavy Lifters Strength',
+      description: 'Compound resistance training emphasizing progressive overload.',
+      instructor: 'Arjun Kapoor',
+      category: 'Strength',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Bandra Hub, Mumbai',
+      price: 999,
+      capacity: 30,
+      daysOffset: 0,
+      startHour: 19,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-3b',
+      title: 'Koramangala Morning Yoga',
+      description: 'Refreshing morning stretch and breathing flow.',
+      instructor: 'Vikram Malhotra',
+      category: 'Yoga',
+      imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop',
+      location: 'Koramangala Studio, Bangalore',
+      price: 599,
+      capacity: 20,
+      daysOffset: 0,
+      startHour: 9,
+      durationMinutes: 60,
+    },
+
+    // Day 1
+    {
+      id: 'class-upcoming-4',
+      title: 'Reformer Pilates Essentials',
+      description: 'Core-centric resistance training using spring tension for muscle toning.',
+      instructor: 'Neha Gupta',
+      category: 'Pilates',
+      imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop',
+      location: 'Baner Studio, Pune',
+      price: 1199,
+      capacity: 16,
+      daysOffset: 1,
+      startHour: 7,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-5',
+      title: 'Zumba Fiesta Cardio',
+      description: 'High-octane dance workout combining Latin & global rhythms.',
+      instructor: 'Rajesh Varma',
+      category: 'Dance Fitness',
+      imageUrl: 'https://images.unsplash.com/photo-1524594152303-9fd13543dd6e?q=80&w=800&auto=format&fit=crop',
+      location: 'Andheri Fitness Center, Mumbai',
+      price: 699,
+      capacity: 35,
+      daysOffset: 1,
+      startHour: 17,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-6',
+      title: 'Endurance Cardio Blast',
+      description: 'Sustained aerobic conditioning focusing on stamina and lung capacity.',
+      instructor: 'Divya Nair',
+      category: 'Cardio',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'Indiranagar Center, Bangalore',
+      price: 799,
+      capacity: 25,
+      daysOffset: 1,
+      startHour: 19,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-6b',
+      title: 'Delhi Spin Blast',
+      description: 'High cadence indoor spin challenge for serious cyclists.',
+      instructor: 'Divya Nair',
+      category: 'Cycling',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'Connaught Place, Delhi',
+      price: 899,
+      capacity: 20,
+      daysOffset: 1,
+      startHour: 11,
+      durationMinutes: 45,
+    },
+
+    // Day 2
+    {
+      id: 'class-upcoming-7',
+      title: 'CrossFit Hero Challenge',
+      description: 'High-energy CrossFit session with Olympic lifts and timed circuits.',
+      instructor: 'Kabir Mehta',
+      category: 'CrossFit',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Hadapsar Center, Pune',
+      price: 1299,
+      capacity: 15,
+      daysOffset: 2,
+      startHour: 9,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-8',
+      title: 'Functional Athletic Training',
+      description: 'Multi-planar movement patterns for speed, agility, and joint resilience.',
+      instructor: 'Ananya Sen',
+      category: 'Functional Training',
+      imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop',
+      location: 'HSR Layout Center, Bangalore',
+      price: 899,
+      capacity: 20,
+      daysOffset: 2,
+      startHour: 11,
+      durationMinutes: 75,
+    },
+    {
+      id: 'class-upcoming-9',
+      title: 'Sunset Rhythm Cycling',
+      description: 'Indoor spin session riding to heavy bass tracks and resistance intervals.',
+      instructor: 'Divya Nair',
+      category: 'Cycling',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'Powai Studio, Mumbai',
+      price: 799,
+      capacity: 20,
+      daysOffset: 2,
+      startHour: 17,
+      durationMinutes: 45,
+    },
+    {
+      id: 'class-upcoming-9b',
+      title: 'Gachibowli Strength Circuit',
+      description: 'Full-body resistance training and power lifting techniques.',
+      instructor: 'Arjun Kapoor',
+      category: 'Strength',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Gachibowli Studio, Hyderabad',
+      price: 899,
+      capacity: 25,
+      daysOffset: 2,
+      startHour: 19,
+      durationMinutes: 60,
+    },
+
+    // Day 3
+    {
+      id: 'class-upcoming-10',
+      title: 'Yin Yoga & Deep Stretch',
+      description: 'Restorative yoga focusing on long holds and deep connective tissue release.',
+      instructor: 'Vikram Malhotra',
+      category: 'Yoga',
+      imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop',
+      location: 'Kothrud Hub, Pune',
+      price: 599,
+      capacity: 20,
+      daysOffset: 3,
+      startHour: 7,
+      durationMinutes: 75,
+    },
+    {
+      id: 'class-upcoming-11',
+      title: 'Tabata HIIT Blitz',
+      description: 'Ultra-intense 20s-on 10s-off intervals for maximum calorie burn.',
+      instructor: 'Priya Sharma',
+      category: 'HIIT',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Koramangala Studio, Bangalore',
+      price: 799,
+      capacity: 20,
+      daysOffset: 3,
+      startHour: 9,
+      durationMinutes: 45,
+    },
+    {
+      id: 'class-upcoming-12',
+      title: 'Hypertrophy Upper Body',
+      description: 'Isolated chest, back, and shoulder lifting for muscle definition.',
+      instructor: 'Arjun Kapoor',
+      category: 'Strength',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Bandra Hub, Mumbai',
+      price: 999,
+      capacity: 25,
+      daysOffset: 3,
+      startHour: 19,
+      durationMinutes: 60,
+    },
+
+    // Day 4
+    {
+      id: 'class-upcoming-13',
+      title: 'Sculpt & Tone Pilates',
+      description: 'Low-impact burning sequences targeting glutes, legs, and abs.',
+      instructor: 'Neha Gupta',
+      category: 'Pilates',
+      imageUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop',
+      location: 'Indiranagar Center, Bangalore',
+      price: 899,
+      capacity: 18,
+      daysOffset: 4,
+      startHour: 9,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-14',
+      title: 'Hip-Hop Dance Cardio',
+      description: 'Upbeat urban dance routines designed to keep your heart rate up.',
+      instructor: 'Rajesh Varma',
+      category: 'Dance Fitness',
+      imageUrl: 'https://images.unsplash.com/photo-1524594152303-9fd13543dd6e?q=80&w=800&auto=format&fit=crop',
+      location: 'Koregaon Park, Pune',
+      price: 699,
+      capacity: 30,
+      daysOffset: 4,
+      startHour: 17,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-15',
+      title: 'Kickboxing Cardio Express',
+      description: 'Combative kick and punch combinations for conditioning and stress relief.',
+      instructor: 'Divya Nair',
+      category: 'Cardio',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'South Delhi Hub, Delhi',
+      price: 799,
+      capacity: 25,
+      daysOffset: 4,
+      startHour: 19,
+      durationMinutes: 45,
+    },
+
+    // Day 5
+    {
+      id: 'class-upcoming-16',
+      title: 'CrossFit Skill & Strength',
+      description: 'Gymnastic skills and heavy barbell complexes.',
+      instructor: 'Kabir Mehta',
+      category: 'CrossFit',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Andheri Fitness Center, Mumbai',
+      price: 1299,
+      capacity: 15,
+      daysOffset: 5,
+      startHour: 7,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-17',
+      title: 'Agility & Core Functional',
+      description: 'Ladder drills, bosu ball balance, and core stability work.',
+      instructor: 'Ananya Sen',
+      category: 'Functional Training',
+      imageUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop',
+      location: 'Viman Nagar, Pune',
+      price: 899,
+      capacity: 20,
+      daysOffset: 5,
+      startHour: 11,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-18',
+      title: 'Spinning Interval Challenge',
+      description: 'Metric-tracked spin session targeting power output and recovery speed.',
+      instructor: 'Divya Nair',
+      category: 'Cycling',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'Jubilee Hills, Hyderabad',
+      price: 799,
+      capacity: 20,
+      daysOffset: 5,
+      startHour: 17,
+      durationMinutes: 45,
+    },
+
+    // Day 6
+    {
+      id: 'class-upcoming-19',
+      title: 'Active Mobility & Stretch',
+      description: 'Guided joint mobilization and muscular lengthening routines.',
+      instructor: 'Vikram Malhotra',
+      category: 'Mobility',
+      imageUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop',
+      location: 'Baner Studio, Pune',
+      price: 599,
+      capacity: 25,
+      daysOffset: 6,
+      startHour: 9,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-20',
+      title: 'Core Stability & Balance',
+      description: 'Isometric holds and rotational core strength drills.',
+      instructor: 'Priya Sharma',
+      category: 'Core Training',
+      imageUrl: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=800&auto=format&fit=crop',
+      location: 'HSR Layout Center, Bangalore',
+      price: 699,
+      capacity: 20,
+      daysOffset: 6,
+      startHour: 11,
+      durationMinutes: 45,
+    },
+    {
+      id: 'class-upcoming-21',
+      title: 'Power Strength & Conditioning',
+      description: 'Full-body compound movements paired with accessory lifts.',
+      instructor: 'Arjun Kapoor',
+      category: 'Strength',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Powai Studio, Mumbai',
+      price: 999,
+      capacity: 25,
+      daysOffset: 6,
+      startHour: 19,
+      durationMinutes: 90,
+    },
+
+    // Day 7
+    {
+      id: 'class-upcoming-22',
+      title: 'Sunday Reset Vinyasa',
+      description: 'Gentle flow to unwind the week and refresh body and mind.',
+      instructor: 'Vikram Malhotra',
+      category: 'Yoga',
+      imageUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop',
+      location: 'Hadapsar Center, Pune',
+      price: 699,
+      capacity: 20,
+      daysOffset: 7,
+      startHour: 9,
+      durationMinutes: 60,
+    },
+    {
+      id: 'class-upcoming-23',
+      title: 'Full Body HIIT Marathon',
+      description: 'End-of-week high energy cardiovascular and bodyweight challenge.',
+      instructor: 'Priya Sharma',
+      category: 'HIIT',
+      imageUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800&auto=format&fit=crop',
+      location: 'Koramangala Studio, Bangalore',
+      price: 899,
+      capacity: 30,
+      daysOffset: 7,
+      startHour: 17,
+      durationMinutes: 60,
+    },
+  ];
+
+  const upsertedFutureClasses = [];
+  for (const item of futureClassesToSeed) {
+    const startTime = getRelativeDate(item.daysOffset, item.startHour);
+    const endTime = getEndDate(startTime, item.durationMinutes);
+
+    const upserted = await prisma.fitnessClass.upsert({
+      where: { id: item.id },
+      update: {
+        title: item.title,
+        description: item.description,
+        instructor: item.instructor,
+        category: item.category,
+        imageUrl: item.imageUrl,
+        location: item.location,
+        price: item.price,
+        startTime,
+        endTime,
+        capacity: item.capacity,
+      },
+      create: {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        instructor: item.instructor,
+        category: item.category,
+        imageUrl: item.imageUrl,
+        location: item.location,
+        price: item.price,
+        startTime,
+        endTime,
+        capacity: item.capacity,
+        availableSeats: item.capacity,
+      },
+    });
+    upsertedFutureClasses.push(upserted);
+  }
+
+  console.log(`Successfully seeded ${upsertedFutureClasses.length} upcoming fitness classes.`);
+  return upsertedFutureClasses;
 }
 
 async function seedBookings() {
-  console.log('Seeding bookings...');
+  console.log('Seeding bookings across users and classes...');
 
   const bookingsToSeed: {
     id: string;
     userId: string;
     classId: string;
     status: BookingStatus;
+    cancelledAt?: Date | null;
   }[] = [];
 
-  // Helper to generate active bookings for a range of member numbers
-  const addActiveBookings = (classId: string, startMember: number, endMember: number) => {
-    for (let i = startMember; i <= endMember; i++) {
+  const members = [
+    'user-member-1',
+    'user-member-2',
+    'user-member-3',
+    'user-member-4',
+    'user-member-5',
+    'user-member-6',
+  ];
+  const admins = ['user-admin-1', 'user-admin-2'];
+  const allUsers = [...members, ...admins];
+
+  // Helper to add active booking
+  const addActive = (classId: string, userIds: string[]) => {
+    for (const userId of userIds) {
       bookingsToSeed.push({
-        id: `booking-${classId}-mem-${i}`,
-        userId: `user-member-${i}`,
+        id: `bk-${classId}-${userId}`,
+        userId,
         classId,
         status: BookingStatus.ACTIVE,
       });
     }
   };
 
-  // 1. class-crossfit-1 (Capacity 10, completely full)
-  addActiveBookings('class-crossfit-1', 1, 10);
+  // Helper to add cancelled booking
+  const addCancelled = (classId: string, userIds: string[], daysAgoCancelled: number = 1) => {
+    for (const userId of userIds) {
+      const cancelledAt = new Date();
+      cancelledAt.setDate(cancelledAt.getDate() - daysAgoCancelled);
+      bookingsToSeed.push({
+        id: `bk-${classId}-${userId}-canc`,
+        userId,
+        classId,
+        status: BookingStatus.CANCELLED,
+        cancelledAt,
+      });
+    }
+  };
 
-  // 2. class-pilates-2 (Capacity 8, completely full)
-  addActiveBookings('class-pilates-2', 1, 8);
+  // --- PAST CLASSES BOOKINGS ---
+  addActive('class-past-1', members);
+  addActive('class-past-1', ['user-admin-1']);
+  addCancelled('class-past-1', ['user-admin-2'], 5);
 
-  // 3. class-hiit-2 (Capacity 12, almost full - 11 bookings)
-  addActiveBookings('class-hiit-2', 1, 10);
-  bookingsToSeed.push({
-    id: 'booking-class-hiit-2-admin',
-    userId: 'user-admin',
-    classId: 'class-hiit-2',
-    status: BookingStatus.ACTIVE,
-  });
+  addActive('class-past-2', ['user-member-1', 'user-member-2', 'user-member-3', 'user-member-4']);
+  addCancelled('class-past-2', ['user-member-5', 'user-member-6'], 5);
 
-  // 4. class-yoga-1 (Capacity 12, active: 8, cancelled: 1)
-  addActiveBookings('class-yoga-1', 1, 8);
-  bookingsToSeed.push({
-    id: 'booking-class-yoga-1-admin-cancelled',
-    userId: 'user-admin',
-    classId: 'class-yoga-1',
-    status: BookingStatus.CANCELLED,
-  });
+  addActive('class-past-3', ['user-member-2', 'user-member-3', 'user-member-4', 'user-member-5', 'user-member-6']);
 
-  // 5. class-yoga-2 (Capacity 20, half-full: 10 active)
-  addActiveBookings('class-yoga-2', 1, 10);
+  addActive('class-past-4', ['user-member-1', 'user-member-3', 'user-member-5']);
+  addCancelled('class-past-4', ['user-member-2'], 4);
 
-  // 6. class-pilates-1 (Capacity 16, half-full: 8 active)
-  addActiveBookings('class-pilates-1', 1, 8);
+  addActive('class-past-5', members);
 
-  // 7. class-strength-1 (Capacity 25, active: 0, cancelled: 3)
-  bookingsToSeed.push({
-    id: 'booking-class-strength-1-mem-1-cancelled',
-    userId: 'user-member-1',
-    classId: 'class-strength-1',
-    status: BookingStatus.CANCELLED,
-  });
-  bookingsToSeed.push({
-    id: 'booking-class-strength-1-mem-2-cancelled',
-    userId: 'user-member-2',
-    classId: 'class-strength-1',
-    status: BookingStatus.CANCELLED,
-  });
-  bookingsToSeed.push({
-    id: 'booking-class-strength-1-mem-3-cancelled',
-    userId: 'user-member-3',
-    classId: 'class-strength-1',
-    status: BookingStatus.CANCELLED,
-  });
+  addActive('class-past-6', ['user-member-2', 'user-member-4', 'user-member-5', 'user-member-6']);
+
+  addActive('class-past-7', ['user-member-1', 'user-member-2', 'user-member-3', 'user-member-4', 'user-member-6']);
+  addCancelled('class-past-7', ['user-member-5'], 2);
+
+  addActive('class-past-8', ['user-member-1', 'user-member-4', 'user-member-5']);
+
+  addActive('class-past-9', members);
+
+  addActive('class-past-10', ['user-member-1', 'user-member-3', 'user-member-5', 'user-member-6']);
+  addCancelled('class-past-10', ['user-member-4'], 1);
+
+  // --- UPCOMING CLASSES BOOKINGS ---
+  addActive('class-upcoming-1', ['user-member-1', 'user-member-2', 'user-member-3']);
+  addActive('class-upcoming-2', ['user-member-1', 'user-member-4', 'user-member-5']);
+  addActive('class-upcoming-3', ['user-member-2', 'user-member-3', 'user-member-4', 'user-member-5', 'user-member-6']);
+  addActive('class-upcoming-3b', ['user-member-1', 'user-member-6']);
+
+  addActive('class-upcoming-4', members);
+  addActive('class-upcoming-5', ['user-member-1', 'user-member-6']);
+  addActive('class-upcoming-6', ['user-member-2', 'user-member-3', 'user-member-4', 'user-member-5']);
+  addActive('class-upcoming-6b', ['user-member-1', 'user-member-2']);
+
+  addActive('class-upcoming-7', allUsers); // full capacity simulation
+  addActive('class-upcoming-8', ['user-member-1', 'user-member-3', 'user-member-5', 'user-admin-1', 'user-admin-2']);
+  addActive('class-upcoming-9', ['user-member-2', 'user-member-4', 'user-member-6']);
+  addActive('class-upcoming-9b', ['user-member-3', 'user-member-5']);
+
+  addActive('class-upcoming-10', ['user-member-1', 'user-member-2', 'user-member-3', 'user-member-4']);
+  addActive('class-upcoming-11', ['user-member-4', 'user-member-5', 'user-member-6']);
+  addActive('class-upcoming-12', ['user-member-1', 'user-member-3', 'user-member-5', 'user-admin-1']);
+
+  addActive('class-upcoming-13', ['user-member-2', 'user-member-4', 'user-member-6']);
+  addActive('class-upcoming-14', ['user-member-1', 'user-member-5']);
+  addActive('class-upcoming-15', ['user-member-3', 'user-member-4']);
+
+  addActive('class-upcoming-16', ['user-member-2', 'user-member-3', 'user-member-4', 'user-admin-2']);
+  addActive('class-upcoming-17', ['user-member-1', 'user-member-3', 'user-member-6']);
+  addActive('class-upcoming-18', ['user-member-2', 'user-member-5']);
+
+  addActive('class-upcoming-19', ['user-member-1', 'user-member-2', 'user-member-3', 'user-member-4']);
+  addActive('class-upcoming-20', ['user-member-4', 'user-member-5', 'user-member-6']);
+  addActive('class-upcoming-21', ['user-member-1', 'user-member-3', 'user-member-5']);
 
   const upsertedBookings = [];
   for (const booking of bookingsToSeed) {
@@ -558,14 +862,14 @@ async function seedBookings() {
       },
       update: {
         status: booking.status,
-        cancelledAt: booking.status === BookingStatus.CANCELLED ? new Date() : null,
+        cancelledAt: booking.cancelledAt || (booking.status === BookingStatus.CANCELLED ? new Date() : null),
       },
       create: {
         id: booking.id,
         userId: booking.userId,
         classId: booking.classId,
         status: booking.status,
-        cancelledAt: booking.status === BookingStatus.CANCELLED ? new Date() : null,
+        cancelledAt: booking.cancelledAt || (booking.status === BookingStatus.CANCELLED ? new Date() : null),
       },
     });
     upsertedBookings.push(upserted);
@@ -576,13 +880,11 @@ async function seedBookings() {
 }
 
 async function updateAvailableSeats() {
-  console.log('Calculating and updating available seats for all classes...');
+  console.log('Calculating and updating accurate available seats for all classes...');
 
-  // Get all classes
   const classes = await prisma.fitnessClass.findMany();
 
   for (const fitnessClass of classes) {
-    // Count active bookings for this class
     const activeBookingCount = await prisma.booking.count({
       where: {
         classId: fitnessClass.id,
@@ -602,32 +904,33 @@ async function updateAvailableSeats() {
 }
 
 async function main() {
-  console.log('Starting seed process...');
-  
-  // 1. Clean up existing records to prevent conflicts with old seed data
-  console.log('Cleaning up database...');
+  console.log('Starting SlotTrack database seed process...');
+
+  // 1. Clean up existing records to ensure clean state
+  console.log('Cleaning existing records...');
   await prisma.booking.deleteMany();
   await prisma.fitnessClass.deleteMany();
   await prisma.user.deleteMany();
-  
-  // 2. Precompute hashed password
+
+  // 2. Hash password with bcrypt (10 rounds)
   const hashedPassword = await bcrypt.hash('Password@123', 10);
-  
-  // 3. Run seeders sequentially
+
+  // 3. Execute modular seeders
   await seedUsers(hashedPassword);
-  await seedClasses();
+  await seedPastClasses();
+  await seedFutureClasses();
   await seedBookings();
   await updateAvailableSeats();
 
-  console.log('Database seed complete!');
+  console.log('🎉 Database seeding completed successfully!');
 }
 
 main()
   .catch((e) => {
-    console.error('Error during database seed:', e);
+    console.error('❌ Error during database seeding:', e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end(); // close pg pool to prevent hanging
+    await pool.end();
   });

@@ -97,6 +97,35 @@ export const bookingRepository = {
     ]);
   },
 
+  // Find all past fitness classes for Admin history view
+  async findPastClassesPaginated(skip: number, limit: number): Promise<[any[], number]> {
+    const now = new Date();
+    return prisma.$transaction([
+      prisma.fitnessClass.findMany({
+        where: {
+          startTime: { lt: now }
+        },
+        skip,
+        take: limit,
+        orderBy: { startTime: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          startTime: true,
+          endTime: true,
+          category: true,
+          location: true,
+          instructor: true,
+        }
+      }),
+      prisma.fitnessClass.count({
+        where: {
+          startTime: { lt: now }
+        }
+      })
+    ]);
+  },
+
   // Find a booking by ID
   async findById(id: string): Promise<any> {
     return prisma.booking.findUnique({

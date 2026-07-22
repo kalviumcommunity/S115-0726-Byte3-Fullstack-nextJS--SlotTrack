@@ -5,15 +5,33 @@ export const classRepository = {
   // Find all fitness classes matching filters, ordered by startTime ascending
   async findAll(filters?: { category?: string; location?: string }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
     const where: any = {};
+
+    // Exclude past classes prior to today (00:00:00)
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    where.startTime = {
+      gte: startOfToday,
+    };
+
     if (filters?.category) {
       where.category = filters.category;
     }
     if (filters?.location) {
       const loc = filters.location.toLowerCase();
       if (loc === "bangalore") {
-        where.location = { in: ["Bangalore", "Indiranagar", "Koramangala"] };
+        where.OR = [
+          { location: { contains: "Bangalore", mode: "insensitive" } },
+          { location: { contains: "Indiranagar", mode: "insensitive" } },
+          { location: { contains: "Koramangala", mode: "insensitive" } },
+          { location: { contains: "HSR", mode: "insensitive" } },
+        ];
       } else if (loc === "mumbai") {
-        where.location = { in: ["Mumbai", "Bandra Hub", "Andheri Studio", "Powai Center"] };
+        where.OR = [
+          { location: { contains: "Mumbai", mode: "insensitive" } },
+          { location: { contains: "Bandra", mode: "insensitive" } },
+          { location: { contains: "Andheri", mode: "insensitive" } },
+          { location: { contains: "Powai", mode: "insensitive" } },
+        ];
       } else {
         where.location = { contains: filters.location, mode: "insensitive" };
       }

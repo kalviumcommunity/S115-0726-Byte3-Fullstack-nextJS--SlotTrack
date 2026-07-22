@@ -14,10 +14,10 @@ export const bookingController = {
     return bookingService.getBookings(userId, role);
   },
 
-  // Handle retrieving user's booking history with pagination
-  async getHistory(userId: string, query: any): Promise<any> {
+  // Handle retrieving user/admin booking history with pagination
+  async getHistory(userId: string, role: Role, query: any): Promise<any> {
     const validatedQuery = bookingValidator.validateHistoryQuery(query);
-    return bookingService.getHistory(userId, validatedQuery);
+    return bookingService.getHistory(userId, role, validatedQuery);
   },
 
   // Handle booking cancellation
