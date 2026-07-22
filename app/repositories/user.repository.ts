@@ -8,6 +8,12 @@ export const userRepository = {
     });
   },
 
+  async findByEmail(email: string): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { email },
+    });
+  },
+
   async update(id: string, data: { name?: string; gender?: string; age?: number | null }): Promise<User> {
     return prisma.user.update({
       where: { id },

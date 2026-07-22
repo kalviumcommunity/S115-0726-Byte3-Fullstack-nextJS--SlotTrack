@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/navigation/Navbar";
 import ProfileDrawer from "../components/profile/ProfileDrawer";
@@ -58,8 +58,11 @@ export default function DashboardLayout({
         if (dbUser.age !== undefined && dbUser.age !== null) setUserAge(dbUser.age);
         if (dbUser.gender) setUserGender(dbUser.gender);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to fetch user profile", err);
+      if (err?.message?.includes("User not found") || err?.status === 404) {
+        signOut({ callbackUrl: "/login" });
+      }
     }
   };
 
@@ -107,8 +110,11 @@ export default function DashboardLayout({
           };
         });
       setHistory(mapped);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load user bookings/history", err);
+      if (err?.message?.includes("User not found") || err?.status === 404) {
+        signOut({ callbackUrl: "/login" });
+      }
     }
   };
 

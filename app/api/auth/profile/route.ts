@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = (session.user as any).id;
-    const result = await userController.getProfile(userId);
+    const email = session.user?.email || undefined;
+    const result = await userController.getProfile(userId, email);
 
     return NextResponse.json({
       success: true,

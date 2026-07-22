@@ -11,9 +11,19 @@ export const classRepository = {
     if (filters?.location) {
       const loc = filters.location.toLowerCase();
       if (loc === "bangalore") {
-        where.location = { in: ["Bangalore", "Indiranagar", "Koramangala"] };
+        where.OR = [
+          { location: { contains: "Bangalore", mode: "insensitive" } },
+          { location: { contains: "Indiranagar", mode: "insensitive" } },
+          { location: { contains: "Koramangala", mode: "insensitive" } },
+          { location: { contains: "HSR", mode: "insensitive" } },
+        ];
       } else if (loc === "mumbai") {
-        where.location = { in: ["Mumbai", "Bandra Hub", "Andheri Studio", "Powai Center"] };
+        where.OR = [
+          { location: { contains: "Mumbai", mode: "insensitive" } },
+          { location: { contains: "Bandra", mode: "insensitive" } },
+          { location: { contains: "Andheri", mode: "insensitive" } },
+          { location: { contains: "Powai", mode: "insensitive" } },
+        ];
       } else {
         where.location = { contains: filters.location, mode: "insensitive" };
       }
