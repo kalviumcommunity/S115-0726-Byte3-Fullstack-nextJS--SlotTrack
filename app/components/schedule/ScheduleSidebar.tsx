@@ -80,17 +80,29 @@ export default function ScheduleSidebar({
     return classStart.getTime() > now.getTime();
   });
 
-  // 2. Sort: Date ascending, then start time ascending
-  activeUpcoming.sort((a, b) => {
+  // 2. Deduplicate: Ensure each scheduled class appears only ONCE by classId
+  const seenClassIds = new Set<string>();
+  const uniqueActiveUpcoming = activeUpcoming.filter((booking) => {
+    const classId = booking.classId || booking.class?.id;
+    if (!classId) return true;
+    if (seenClassIds.has(classId)) {
+      return false;
+    }
+    seenClassIds.add(classId);
+    return true;
+  });
+
+  // 3. Sort: Date ascending, then start time ascending
+  uniqueActiveUpcoming.sort((a, b) => {
     const timeA = new Date(a.class.startTime).getTime();
     const timeB = new Date(b.class.startTime).getTime();
     return timeA - timeB;
   });
 
-  // 3. Group by calendar day
+  // 4. Group by calendar day
   const groups: { [dateKey: string]: { label: string; dateVal: Date; items: any[] } } = {};
   
-  activeUpcoming.forEach((booking) => {
+  uniqueActiveUpcoming.forEach((booking) => {
     const classStart = new Date(booking.class.startTime);
     const dateKey = `${classStart.getFullYear()}-${classStart.getMonth() + 1}-${classStart.getDate()}`;
     
@@ -110,7 +122,7 @@ export default function ScheduleSidebar({
   });
 
   // Total count of upcoming bookings
-  const totalUpcomingCount = activeUpcoming.length;
+  const totalUpcomingCount = uniqueActiveUpcoming.length;
 
   return (
     <div className="bg-white border border-[#EEF2F6] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 flex flex-col max-h-[540px]">
@@ -132,28 +144,19 @@ export default function ScheduleSidebar({
           {totalUpcomingCount > 0 ? (
             <div className="space-y-4 w-full">
               {sortedGroups.map((group) => (
-                <div key={group.label} className="space-y-2">
-                  {/* Day Header Divider */}
-                  <div className="flex items-center gap-3 pt-2 pb-1">
-                    <span className="font-sans font-extrabold text-xs uppercase tracking-wider text-[#72BF6A] whitespace-nowrap">
-                      {group.label}
-                    </span>
-                    <div className="h-px bg-[#EEF2F6] flex-1"></div>
-                  </div>
+                <div key={group.label} className="space-y-1">
                   {/* Items of the day */}
-                  <div className="space-y-1">
-                    {group.items.map((booking) => (
-                      <ScheduleItem
-                        key={booking.id}
-                        id={booking.classId} // Pass classId for cancel action
-                        title={booking.class.title}
-                        time={formatTimeStr(booking.class.startTime, booking.class.endTime)}
-                        location={booking.class.location}
-                        status="booked"
-                        onCancel={onCancelBooking}
-                      />
-                    ))}
-                  </div>
+                  {group.items.map((booking) => (
+                    <ScheduleItem
+                      key={booking.classId || booking.id}
+                      id={booking.classId} // Pass classId for cancel action
+                      title={booking.class.title}
+                      time={formatTimeStr(booking.class.startTime, booking.class.endTime)}
+                      location={booking.class.location}
+                      status="booked"
+                      onCancel={onCancelBooking}
+                    />
+                  ))}
                 </div>
               ))}
             </div>
