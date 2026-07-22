@@ -10,7 +10,7 @@ export interface ProfileCardProps {
   contact?: string;
   gender?: string;
   avatarUrl?: string;
-  onEditToggle?: (name: string, gender?: string) => void;
+  onEditToggle?: (name: string, age?: number, gender?: string) => void;
 }
 
 export default function ProfileCard({
@@ -30,7 +30,7 @@ export default function ProfileCard({
 
   const handleSave = () => {
     setIsEditing(false);
-    if (onEditToggle) onEditToggle(formData.name, formData.gender);
+    if (onEditToggle) onEditToggle(formData.name, formData.age !== undefined && formData.age !== null ? Number(formData.age) : undefined, formData.gender);
   };
 
   return (
@@ -74,8 +74,8 @@ export default function ProfileCard({
               {isEditing ? (
                 <input
                   type="number"
-                  value={formData.age}
-                  onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
+                  value={formData.age ?? ""}
+                  onChange={(e) => setFormData({ ...formData, age: e.target.value === "" ? (undefined as any) : Number(e.target.value) })}
                   className="w-16 border border-[#EEF2F6] rounded px-1.5 py-0.5 outline-[#72BF6A]"
                 />
               ) : (

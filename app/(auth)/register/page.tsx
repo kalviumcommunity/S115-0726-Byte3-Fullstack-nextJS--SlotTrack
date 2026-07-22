@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [gender, setGender] = useState("Male");
+  const [age, setAge] = useState("");
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -56,6 +57,7 @@ export default function RegisterPage() {
         role: role.toUpperCase(),
         employeeId: role === "admin" ? employeeId : undefined,
         gender,
+        age: age === "" ? undefined : age,
       });
 
       const res = await signIn("credentials", {
@@ -164,6 +166,18 @@ export default function RegisterPage() {
               <option value="Other">Other</option>
             </select>
           </div>
+
+          <Input
+            label="Age"
+            type="number"
+            id="age"
+            placeholder="25"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            required
+            min={13}
+            max={120}
+          />
 
           {role === "admin" && (
             <Input

@@ -55,6 +55,7 @@ export const authService = {
       role,
       employeeId: role === 'ADMIN' ? employeeId : undefined,
       gender: (data as any)?.gender,
+      age: validatedData.age,
     });
 
     // 5. Exclude password hash from returned object using destructuring with underscore prefix for unused var

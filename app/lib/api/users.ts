@@ -7,7 +7,7 @@ export async function getProfile(): Promise<UserType> {
   });
 }
 
-export async function updateProfile(data: { name: string; gender?: string }): Promise<UserType> {
+export async function updateProfile(data: { name: string; age?: number; gender?: string }): Promise<UserType> {
   return request<UserType>('/api/auth/profile', {
     method: 'PATCH',
     body: JSON.stringify(data),

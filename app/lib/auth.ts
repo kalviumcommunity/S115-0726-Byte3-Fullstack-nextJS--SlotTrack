@@ -44,16 +44,24 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           role: user.role,
           gender: user.gender,
+          age: user.age,
         };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role;
         token.gender = (user as any).gender;
+        token.age = (user as any).age;
+        token.name = user.name;
+      }
+      if (trigger === 'update' && session?.user) {
+        if (session.user.name !== undefined) token.name = session.user.name;
+        if (session.user.gender !== undefined) token.gender = session.user.gender;
+        if (session.user.age !== undefined) token.age = session.user.age;
       }
       return token;
     },
@@ -62,6 +70,10 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
         (session.user as any).gender = token.gender;
+        (session.user as any).age = token.age;
+        if (token.name) {
+          session.user.name = token.name;
+        }
       }
       return session;
     },

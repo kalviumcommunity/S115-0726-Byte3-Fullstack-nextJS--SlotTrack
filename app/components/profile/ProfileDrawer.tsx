@@ -16,7 +16,7 @@ export interface ProfileDrawerProps {
   userContact?: string;
   userGender?: string;
   history: HistoryRow[];
-  onProfileUpdate?: (name: string, gender?: string) => void;
+  onProfileUpdate?: (name: string, age?: number, gender?: string) => void;
 }
 
 export default function ProfileDrawer({

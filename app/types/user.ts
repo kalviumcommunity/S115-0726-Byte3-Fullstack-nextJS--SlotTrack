@@ -8,6 +8,7 @@ export interface UserType {
   role: Role;
   employeeId?: string | null;
   gender?: string | null;
+  age?: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
