@@ -7,7 +7,7 @@ import Navbar from "../components/navigation/Navbar";
 import ProfileDrawer from "../components/profile/ProfileDrawer";
 import { HistoryRow } from "../components/tables/HistoryTable";
 import { getBookings, bookClass, cancelBooking, getBookingHistory } from "@/app/lib/api/bookings";
-import { updateProfile } from "@/app/lib/api/users";
+import { getProfile, updateProfile } from "@/app/lib/api/users";
 import { BookingType } from "@/app/types/booking";
 
 // Define the dashboard state context
@@ -46,10 +46,26 @@ export default function DashboardLayout({
   const [bookedClassIds, setBookedClassIds] = useState<string[]>([]);
   const [history, setHistory] = useState<HistoryRow[]>([]);
   const [profileName, setProfileName] = useState("");
+  const [userAge, setUserAge] = useState<number | undefined>(undefined);
+  const [userGender, setUserGender] = useState<string | undefined>(undefined);
   const [selectedLocation, setSelectedLocation] = useState("Pune");
+
+  const fetchUserProfile = async () => {
+    try {
+      const dbUser = await getProfile();
+      if (dbUser) {
+        if (dbUser.name) setProfileName(dbUser.name);
+        if (dbUser.age !== undefined && dbUser.age !== null) setUserAge(dbUser.age);
+        if (dbUser.gender) setUserGender(dbUser.gender);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user profile", err);
+    }
+  };
 
   const fetchData = async () => {
     try {
+      await fetchUserProfile();
       const activeBookings = await getBookings();
       setBookings(activeBookings);
       setBookedClassIds(activeBookings.filter((b) => b.status === "ACTIVE").map((b) => b.classId));
@@ -104,6 +120,12 @@ export default function DashboardLayout({
       if (session?.user?.name) {
         setProfileName(session.user.name);
       }
+      if ((session?.user as any)?.age !== undefined) {
+        setUserAge((session.user as any).age);
+      }
+      if ((session?.user as any)?.gender) {
+        setUserGender((session.user as any).gender);
+      }
     }
   }, [status, session]);
 
@@ -126,10 +148,12 @@ export default function DashboardLayout({
     }
   };
 
-  const handleProfileUpdate = async (newName: string, newGender?: string) => {
+  const handleProfileUpdate = async (newName: string, newAge?: number, newGender?: string) => {
     try {
-      const updatedUser = await updateProfile({ name: newName, gender: newGender });
-      setProfileName(updatedUser.name);
+      const updatedUser = await updateProfile({ name: newName, age: newAge, gender: newGender });
+      if (updatedUser.name) setProfileName(updatedUser.name);
+      if (updatedUser.age !== undefined && updatedUser.age !== null) setUserAge(updatedUser.age);
+      if (updatedUser.gender) setUserGender(updatedUser.gender);
       
       // Update session so it propagates to header/navbar
       if (updateSession) {
@@ -139,6 +163,7 @@ export default function DashboardLayout({
             ...session?.user,
             name: updatedUser.name,
             gender: updatedUser.gender,
+            age: updatedUser.age,
           },
         });
       }
@@ -201,9 +226,9 @@ export default function DashboardLayout({
           isOpen={isProfileOpen}
           onClose={() => setIsProfileOpen(false)}
           userName={nameToDisplay}
-          userAge={21}
+          userAge={userAge ?? (session?.user as any)?.age ?? 21}
           userContact={session?.user?.email || ""}
-          userGender={(session?.user as any)?.gender || "Male"}
+          userGender={userGender || (session?.user as any)?.gender || "Male"}
           history={history}
           onProfileUpdate={handleProfileUpdate}
         />

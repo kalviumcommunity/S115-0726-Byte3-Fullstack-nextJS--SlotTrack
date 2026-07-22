@@ -28,6 +28,7 @@ model User {
   role       Role      @default(MEMBER)
   employeeId String?   @unique
   gender     String?
+  age        Int?
   bookings   Booking[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

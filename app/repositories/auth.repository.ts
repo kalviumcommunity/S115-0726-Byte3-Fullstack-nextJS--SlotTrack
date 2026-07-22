@@ -21,6 +21,7 @@ export const authRepository = {
     role?: 'MEMBER' | 'ADMIN';
     employeeId?: string;
     gender?: string;
+    age?: number | null;
   }): Promise<User> {
     return prisma.user.create({
       data: {
@@ -30,6 +31,7 @@ export const authRepository = {
         role: data.role || 'MEMBER',
         employeeId: data.employeeId || null,
         gender: data.gender || null,
+        age: data.age !== undefined && data.age !== null ? Number(data.age) : null,
       },
     });
   },

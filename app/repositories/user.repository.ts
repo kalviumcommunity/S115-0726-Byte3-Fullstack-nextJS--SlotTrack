@@ -8,12 +8,13 @@ export const userRepository = {
     });
   },
 
-  async update(id: string, data: { name: string; gender?: string }): Promise<User> {
+  async update(id: string, data: { name?: string; gender?: string; age?: number | null }): Promise<User> {
     return prisma.user.update({
       where: { id },
       data: {
-        name: data.name,
-        gender: data.gender,
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.gender !== undefined && { gender: data.gender }),
+        ...(data.age !== undefined && { age: data.age }),
       },
     });
   },

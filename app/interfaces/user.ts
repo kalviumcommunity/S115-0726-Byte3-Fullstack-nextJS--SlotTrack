@@ -3,5 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: "admin" | "member";
+  age?: number;
+  gender?: string;
   createdAt: string;
 }
