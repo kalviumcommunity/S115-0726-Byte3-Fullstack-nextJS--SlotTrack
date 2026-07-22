@@ -231,6 +231,7 @@ export default function DashboardLayout({
           userGender={userGender || (session?.user as any)?.gender || "Male"}
           history={history}
           onProfileUpdate={handleProfileUpdate}
+          role={userRole}
         />
       </div>
     </DashboardContext.Provider>
