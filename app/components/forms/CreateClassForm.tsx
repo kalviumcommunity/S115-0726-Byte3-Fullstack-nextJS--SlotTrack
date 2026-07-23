@@ -10,6 +10,7 @@ interface CreateClassFormProps {
     title: string;
     category: string;
     location: string;
+    detailedLocation?: string;
     startTime: string;
     endTime: string;
     date: string;
@@ -25,6 +26,7 @@ export default function CreateClassForm({ onSubmit, onCancel }: CreateClassFormP
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [location, setLocation] = useState(LOCATIONS[0]);
+  const [detailedLocation, setDetailedLocation] = useState("");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -71,6 +73,7 @@ export default function CreateClassForm({ onSubmit, onCancel }: CreateClassFormP
       title,
       category,
       location,
+      detailedLocation: detailedLocation.trim() || undefined,
       date,
       startTime: formatTime12hr(startTime),
       endTime: formatTime12hr(endTime),
@@ -127,6 +130,15 @@ export default function CreateClassForm({ onSubmit, onCancel }: CreateClassFormP
         </select>
         {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
       </div>
+
+      <Input
+        label="Venue / Detailed Location"
+        id="class-detailed-location"
+        placeholder="e.g. Amanora Mall, 5th Floor, Hadapsar, Pune 411028"
+        value={detailedLocation}
+        onChange={(e) => setDetailedLocation(e.target.value)}
+        error={errors.detailedLocation}
+      />
 
       <Input
         label="Date"

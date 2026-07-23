@@ -10,5 +10,6 @@ export interface FitnessClass {
   availableSeats: number;
   category: string;
   location: string;
+  detailedLocation?: string;
   price: number;
 }

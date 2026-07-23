@@ -40,9 +40,11 @@ export const classService = {
       title: validated.title,
       description: validated.description,
       instructor: validated.instructor,
+      instructorId: validated.instructorId,
       category: validated.category,
       imageUrl: validated.imageUrl,
       location: validated.location,
+      detailedLocation: validated.detailedLocation,
       startTime,
       endTime,
       capacity,
@@ -81,6 +83,7 @@ export const classService = {
       category?: string;
       imageUrl?: string;
       location?: string;
+      detailedLocation?: string;
       startTime?: Date;
       endTime?: Date;
       capacity?: number;
@@ -93,6 +96,7 @@ export const classService = {
     if (validated.category !== undefined) updateData.category = validated.category;
     if (validated.imageUrl !== undefined) updateData.imageUrl = validated.imageUrl;
     if (validated.location !== undefined) updateData.location = validated.location;
+    if (validated.detailedLocation !== undefined) updateData.detailedLocation = validated.detailedLocation;
     if (validated.price !== undefined) updateData.price = validated.price;
 
     // Check date bounds

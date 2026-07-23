@@ -129,12 +129,9 @@ export default function ScheduleSidebar({
     <div className="bg-white border border-[#EEF2F6] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] p-6 flex flex-col max-h-[540px]">
       {/* Sidebar Header */}
       <div className="mb-5 shrink-0">
-        <h3 className="font-sans font-bold text-2xl text-[#111827] mb-1">
+        <h3 className="font-sans font-bold text-2xl text-[#111827]">
           Your Schedule
         </h3>
-        <p className="font-sans text-sm font-semibold text-[#72BF6A]">
-          {getFigmaFormattedDate()}
-        </p>
       </div>
 
       {/* Scrollable Schedule list */}

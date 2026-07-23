@@ -21,35 +21,39 @@ enum BookingStatus {
 }
 
 model User {
-  id         String    @id @default(cuid())
+  id         String         @id @default(cuid())
   name       String
-  email      String    @unique
+  email      String         @unique
   password   String
-  role       Role      @default(MEMBER)
-  employeeId String?   @unique
+  role       Role           @default(MEMBER)
+  employeeId String?        @unique
   gender     String?
   age        Int?
   bookings   Booking[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  classes    FitnessClass[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }
 
 model FitnessClass {
-  id             String    @id @default(cuid())
-  title          String
-  description    String
-  instructor     String
-  category       String
-  imageUrl       String
-  location       String
-  startTime      DateTime
-  endTime        DateTime
-  capacity       Int
-  availableSeats Int
-  price          Float     @default(0.0)
-  bookings       Booking[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               String    @id @default(cuid())
+  title            String
+  description      String
+  instructor       String
+  instructorId     String?
+  instructorUser   User?     @relation(fields: [instructorId], references: [id], onDelete: SetNull)
+  category         String
+  imageUrl         String
+  location         String
+  detailedLocation String?
+  startTime        DateTime
+  endTime          DateTime
+  capacity         Int
+  availableSeats   Int
+  price            Float     @default(0.0)
+  bookings         Booking[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Booking {

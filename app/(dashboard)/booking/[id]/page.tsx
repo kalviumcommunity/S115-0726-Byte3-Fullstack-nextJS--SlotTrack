@@ -85,7 +85,25 @@ export default function DynamicBookingPage({ params }: PageProps) {
   const durationStr = `${durationMinutes} Minutes`;
 
   const imageUrl = currentClass.imageUrl || "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop";
-  const instructorName = currentClass.instructor || "Instructor";
+  const instructorUser = (currentClass as any).instructorUser;
+  const instructorName = instructorUser?.name || currentClass.instructor || "Instructor";
+  const instructorRole = instructorUser?.role
+    ? (instructorUser.role === "ADMIN" ? "Senior Trainer" : "Fitness Trainer")
+    : undefined;
+  const instructorExp = instructorUser?.age
+    ? `${Math.max(1, instructorUser.age - 20)}+ years Experience`
+    : undefined;
+
+  const handleBookingAction = async () => {
+    if (!currentClass) return;
+    await toggleBookClass(currentClass.id);
+    try {
+      const updatedClass = await getClassById(id);
+      setCurrentClass(updatedClass);
+    } catch (err) {
+      console.error("Failed to refresh class details", err);
+    }
+  };
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12 animate-fade-in">
@@ -119,6 +137,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
               time={timeStr}
               date={formattedDate}
               location={currentClass.location}
+              detailedLocation={currentClass.detailedLocation || currentClass.location}
               bookedSeats={currentBookedSeats}
               capacity={currentClass.capacity}
             />
@@ -131,7 +150,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
               availableSeats={currentAvailableSeats}
               capacity={currentClass.capacity}
               price={currentClass.price}
-              onBook={() => toggleBookClass(currentClass.id)}
+              onBook={handleBookingAction}
               isBooked={isCurrentlyBooked}
             />
           </div>
@@ -153,11 +172,8 @@ export default function DynamicBookingPage({ params }: PageProps) {
       <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
         <InstructorCard
           name={instructorName}
-          role="Senior Trainer"
-          avatar="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop"
-          bio="Certified fitness professional committed to delivering premium training."
-          experience="8+ years Experience"
-          certified={true}
+          role={instructorRole}
+          experience={instructorExp}
         />
       </div>
 

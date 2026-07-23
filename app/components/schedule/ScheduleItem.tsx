@@ -34,30 +34,31 @@ export default function ScheduleItem({
   };
 
   return (
-    <div className="flex items-center justify-between py-4 px-1 border-b border-[#EEF2F6] hover:bg-[#F8F8FA] rounded-lg transition-all duration-200 group">
-      <div className="flex flex-col space-y-1">
-        <span className="font-sans font-bold text-base text-[#111827] group-hover:text-[#72BF6A] transition-colors">
+    <div className="flex items-center justify-between py-4 px-1 border-b border-[#EEF2F6] hover:bg-[#F8F8FA] rounded-lg transition-all duration-200 group gap-2">
+      <div className="flex flex-col space-y-1 min-w-0 flex-1">
+        <span className="font-sans font-bold text-base text-[#111827] group-hover:text-[#72BF6A] transition-colors truncate">
           {title}
         </span>
         <div className="flex items-center space-x-2 text-xs font-semibold text-[#6B7280]">
-          <span>{time}</span>
+          <span className="shrink-0">{time}</span>
           {location && (
             <>
-              <span>•</span>
-              <span className="truncate max-w-[150px]">{location}</span>
+              <span className="shrink-0">•</span>
+              <span className="truncate">{location}</span>
             </>
           )}
         </div>
       </div>
       
-      <div className="flex items-center space-x-2.5">
-        <Badge variant={statusVariants[status]}>
-          {statusLabels[status]}
-        </Badge>
+      <div className="flex items-center space-x-2.5 shrink-0">
         {status === "booked" && onCancel && (
           <button
-            onClick={() => onCancel(id)}
-            className="text-xs text-[#EF4444] hover:text-red-700 font-bold hover:underline transition-all active:scale-95"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onCancel(id);
+            }}
+            className="text-xs text-[#EF4444] hover:text-red-700 font-bold hover:underline transition-all active:scale-95 cursor-pointer"
             title="Cancel this session"
           >
             Cancel

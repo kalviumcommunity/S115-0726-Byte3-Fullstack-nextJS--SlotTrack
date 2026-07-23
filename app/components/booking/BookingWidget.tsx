@@ -8,7 +8,7 @@ export interface BookingWidgetProps {
   availableSeats?: number;
   capacity?: number;
   price?: number;
-  onBook?: (classId?: string) => void;
+  onBook?: (classId?: string) => Promise<void> | void;
   isBooked?: boolean;
   isLoading?: boolean;
 }
@@ -24,13 +24,16 @@ export default function BookingWidget({
 }: BookingWidgetProps) {
   const [internalLoading, setInternalLoading] = useState(false);
 
-  const handleBookClick = () => {
+  const handleBookClick = async () => {
     if (!onBook) return;
     setInternalLoading(true);
-    setTimeout(() => {
-      onBook(classId);
+    try {
+      await onBook(classId);
+    } catch (err) {
+      console.error("Booking action failed", err);
+    } finally {
       setInternalLoading(false);
-    }, 600);
+    }
   };
 
   const activeLoading = isLoading || internalLoading;
@@ -71,7 +74,11 @@ export default function BookingWidget({
         <button
           onClick={handleBookClick}
           disabled={(availableSeats <= 0 && !isBooked) || activeLoading}
-          className="w-full rounded-xl bg-[#72BF6A] py-3 text-sm font-bold text-white hover:bg-[#5eaa57] transition-colors active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center"
+          className={`w-full rounded-xl py-3 text-sm font-bold text-white transition-colors active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center ${
+            isBooked
+              ? "bg-danger hover:bg-red-600 shadow-[0_2px_8px_rgba(239,68,68,0.12)] hover:shadow-[0_4px_12px_rgba(239,68,68,0.25)]"
+              : "bg-[#72BF6A] hover:bg-[#5eaa57]"
+          }`}
         >
           {activeLoading ? (
             <span className="flex items-center justify-center gap-2">
@@ -81,7 +88,7 @@ export default function BookingWidget({
               </svg>
               Processing...
             </span>
-          ) : isBooked ? "Cancel Booking" : availableSeats <= 0 ? "Class Full" : "Confirm Booking"}
+          ) : isBooked ? "Cancel Booking" : availableSeats <= 0 ? "Class Full" : "Book Now"}
         </button>
 
         <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-250 bg-white py-2.5 text-sm font-bold text-[#111827] shadow-[0px_2px_4px_rgba(0,0,0,0.01)] transition-colors hover:bg-gray-50 active:scale-[0.98] cursor-pointer">

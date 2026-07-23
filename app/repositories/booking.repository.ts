@@ -157,12 +157,23 @@ export const bookingRepository = {
       }
 
       const currentClass = classes[0];
-      if (currentClass.availableSeats <= 0) {
+      const capacity = currentClass.capacity;
+      const currentAvailable = currentClass.availableSeats;
+
+      if (currentAvailable <= 0) {
         throw new ConflictError("The selected class is already fully booked.");
       }
 
       let bookingRecord;
       if (existingBooking) {
+        // Verify current status within transaction lock
+        const currentDbBooking = await tx.booking.findUnique({
+          where: { id: existingBooking.id }
+        });
+        if (currentDbBooking && currentDbBooking.status === BookingStatus.ACTIVE) {
+          throw new ConflictError("You have already booked a slot in this class.");
+        }
+
         // Reactivate a cancelled booking
         bookingRecord = await tx.booking.update({
           where: { id: existingBooking.id },
@@ -173,6 +184,18 @@ export const bookingRepository = {
           }
         });
       } else {
+        // Check for duplicate active booking within transaction lock
+        const existingActive = await tx.booking.findFirst({
+          where: {
+            userId,
+            classId,
+            status: BookingStatus.ACTIVE
+          }
+        });
+        if (existingActive) {
+          throw new ConflictError("You have already booked a slot in this class.");
+        }
+
         // Create new booking record
         bookingRecord = await tx.booking.create({
           data: {
@@ -183,13 +206,12 @@ export const bookingRepository = {
         });
       }
 
-      // Decrement class seats by 1
+      // Decrement class seats by 1, strictly bounded between 0 and capacity
+      const newAvailable = Math.max(0, Math.min(capacity, currentAvailable - 1));
       const updatedClass = await tx.fitnessClass.update({
         where: { id: classId },
         data: {
-          availableSeats: {
-            decrement: 1
-          }
+          availableSeats: newAvailable
         }
       });
 
@@ -209,7 +231,21 @@ export const bookingRepository = {
   // Atomically cancel booking and increment class seats
   async cancelBookingWithSeatIncrement(bookingId: string, classId: string): Promise<any> {
     return prisma.$transaction(async (tx) => {
-      // Lock the associated class row
+      // 1. Lock and retrieve the booking row to verify its status within the transaction
+      const bookings = await tx.$queryRaw<any[]>`
+        SELECT id, "userId", "classId", status 
+        FROM "Booking" 
+        WHERE id = ${bookingId} 
+        FOR UPDATE
+      `;
+
+      if (!bookings || bookings.length === 0) {
+        throw new NotFoundError(`Booking with ID ${bookingId} does not exist.`);
+      }
+
+      const currentBooking = bookings[0];
+
+      // 2. Lock the associated class row
       const classes = await tx.$queryRaw<any[]>`
         SELECT id, capacity, "availableSeats" 
         FROM "FitnessClass" 
@@ -221,6 +257,27 @@ export const bookingRepository = {
         throw new NotFoundError(`Fitness class with ID ${classId} does not exist.`);
       }
 
+      const currentClass = classes[0];
+      const capacity = currentClass.capacity;
+      const currentAvailable = currentClass.availableSeats;
+
+      // IDEMPOTENCY CHECK: If booking is ALREADY CANCELLED, do NOT increment seats again!
+      if (currentBooking.status === BookingStatus.CANCELLED) {
+        const safeSeats = Math.min(capacity, Math.max(0, currentAvailable));
+        if (currentAvailable !== safeSeats) {
+          await tx.fitnessClass.update({
+            where: { id: classId },
+            data: { availableSeats: safeSeats }
+          });
+        }
+        return {
+          id: currentBooking.id,
+          status: BookingStatus.CANCELLED,
+          alreadyCancelled: true,
+          availableSeatsRemaining: safeSeats
+        };
+      }
+
       // Update booking status to CANCELLED and set cancelledAt
       const updatedBooking = await tx.booking.update({
         where: { id: bookingId },
@@ -230,13 +287,12 @@ export const bookingRepository = {
         }
       });
 
-      // Increment class seats by 1
+      // Increment class seats by 1, strictly bounded by capacity: 0 <= availableSeats <= capacity
+      const newAvailable = Math.min(capacity, Math.max(0, currentAvailable + 1));
       const updatedClass = await tx.fitnessClass.update({
         where: { id: classId },
         data: {
-          availableSeats: {
-            increment: 1
-          }
+          availableSeats: newAvailable
         }
       });
 

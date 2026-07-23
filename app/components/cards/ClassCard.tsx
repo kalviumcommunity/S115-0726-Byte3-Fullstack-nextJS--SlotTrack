@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Badge from "../ui/Badge";
 import Button from "../ui/Button";
 
@@ -14,6 +14,7 @@ export interface ClassCardProps {
   time: string;
   date: string;
   location: string;
+  detailedLocation?: string;
   price: number;
   isBooked?: boolean;
   onBookToggle?: (id: string) => void;
@@ -27,12 +28,22 @@ export default function ClassCard({
   time,
   date,
   location,
+  detailedLocation,
   price,
   isBooked = false,
   onBookToggle,
 }: ClassCardProps) {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/booking/${id}`);
+  };
+
   return (
-    <div className="bg-white border border-[#EEF2F6] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-6px] transition-all duration-500 group flex flex-col h-full">
+    <div
+      onClick={handleCardClick}
+      className="bg-white border border-[#EEF2F6] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-6px] transition-all duration-500 group flex flex-col h-full cursor-pointer"
+    >
       {/* Cover Image & Category Badge */}
       <div className="relative h-48 md:h-[220px] w-full overflow-hidden">
         <Image
@@ -84,20 +95,27 @@ export default function ClassCard({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25s-7.5-4.108-7.5-11.25a7.5 7.5 0 1115 0z" />
               </svg>
-              <span className="truncate">{location}</span>
+              <span className="truncate" title={detailedLocation || location}>{detailedLocation || location}</span>
             </div>
           </div>
         </div>
 
         {/* Action Button */}
-        <Link href={`/booking/${id}`} className="w-full mt-2 block">
+        <div className="w-full mt-2">
           <Button
-            variant={isBooked ? "outline" : "primary"}
+            variant={isBooked ? "danger" : "primary"}
             className="w-full text-base font-bold py-3"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (onBookToggle) {
+                onBookToggle(id);
+              }
+            }}
           >
             {isBooked ? "Cancel Booking" : "Book Now"}
           </Button>
-        </Link>
+        </div>
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ export const classRepository = {
       }
     }
 
-    return prisma.fitnessClass.findMany({
+    const classes = await prisma.fitnessClass.findMany({
       where,
       orderBy: {
         startTime: 'asc',
@@ -47,9 +47,22 @@ export const classRepository = {
         title: true,
         description: true,
         instructor: true,
+        instructorId: true,
+        instructorUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            employeeId: true,
+            gender: true,
+            age: true,
+          },
+        },
         category: true,
         imageUrl: true,
         location: true,
+        detailedLocation: true,
         startTime: true,
         endTime: true,
         capacity: true,
@@ -57,13 +70,76 @@ export const classRepository = {
         price: true,
       },
     });
+
+    return classes.map((cls) => {
+      const safeAvailable = Math.min(cls.capacity, Math.max(0, cls.availableSeats));
+      if (cls.availableSeats !== safeAvailable) {
+        prisma.fitnessClass.update({
+          where: { id: cls.id },
+          data: { availableSeats: safeAvailable },
+        }).catch(() => {});
+      }
+      return {
+        ...cls,
+        availableSeats: safeAvailable,
+      };
+    });
   },
 
   // Find a fitness class by ID
   async findById(id: string): Promise<FitnessClass | null> {
-    return prisma.fitnessClass.findUnique({
+    const fitnessClass = await prisma.fitnessClass.findUnique({
       where: { id },
+      include: {
+        instructorUser: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            employeeId: true,
+            gender: true,
+            age: true,
+          },
+        },
+      },
     });
+
+    if (!fitnessClass) return null;
+
+    if (!fitnessClass.instructorUser && (fitnessClass.instructorId || fitnessClass.instructor)) {
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            ...(fitnessClass.instructorId ? [{ id: fitnessClass.instructorId }] : []),
+            { name: { equals: fitnessClass.instructor, mode: 'insensitive' } },
+          ],
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          employeeId: true,
+          gender: true,
+          age: true,
+        },
+      });
+      if (user) {
+        (fitnessClass as any).instructorUser = user;
+      }
+    }
+
+    const safeAvailable = Math.min(fitnessClass.capacity, Math.max(0, fitnessClass.availableSeats));
+    if (fitnessClass.availableSeats !== safeAvailable) {
+      await prisma.fitnessClass.update({
+        where: { id: fitnessClass.id },
+        data: { availableSeats: safeAvailable },
+      }).catch(() => {});
+      fitnessClass.availableSeats = safeAvailable;
+    }
+
+    return fitnessClass;
   },
 
   // Create a new fitness class
@@ -71,9 +147,11 @@ export const classRepository = {
     title: string;
     description: string;
     instructor: string;
+    instructorId?: string;
     category: string;
     imageUrl: string;
     location: string;
+    detailedLocation?: string;
     startTime: Date;
     endTime: Date;
     capacity: number;
@@ -95,6 +173,7 @@ export const classRepository = {
       category?: string;
       imageUrl?: string;
       location?: string;
+      detailedLocation?: string;
       startTime?: Date;
       endTime?: Date;
       capacity?: number;
