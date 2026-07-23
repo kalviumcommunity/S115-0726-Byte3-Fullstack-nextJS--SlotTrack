@@ -1,0 +1,109 @@
+# ============================================================
+# SlotTrack - Continuous Integration (CI) Workflow
+# ============================================================
+#
+# PURPOSE
+# -------
+# This workflow verifies every Pull Request to `main` and every
+# push to `main` by running lint and a production build.
+#
+# BRANCH PROTECTION (NOT configured here - must be set manually)
+# --------------------------------------------------------------
+# To enforce this workflow as a required check before merging,
+# go to:
+#   GitHub > Settings > Branches > Branch protection rules > main
+# and enable:
+#   "Require status checks to pass before merging"
+#   Select the "ci" check (this workflow job name)
+#   "Require branches to be up to date before merging"
+#
+# This workflow does NOT modify any repository settings; that
+# must be done by a repository administrator in the GitHub UI.
+# ============================================================
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Cancel in-progress runs for the same branch/PR so only the
+# latest commit is checked (saves CI minutes).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # ----------------------------------------------------------
+      # 1. Checkout the repository
+      # ----------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----------------------------------------------------------
+      # 2. Install pnpm via the official action
+      #    NOTE: The project ships a package-lock.json (npm), but
+      #    pnpm is used here as required by the CI specification.
+      #    pnpm is fully compatible with the existing package.json.
+      # ----------------------------------------------------------
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # ----------------------------------------------------------
+      # 3. Set up Node.js 20 with pnpm cache enabled
+      #    Node 20 is derived from @types/node: ^20 in
+      #    package.json and is the current LTS release.
+      # ----------------------------------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # ----------------------------------------------------------
+      # 4. Install dependencies (frozen lockfile enforces
+      #    reproducibility - will fail if lockfile is out of date)
+      # ----------------------------------------------------------
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ----------------------------------------------------------
+      # 5. Lint
+      #    Uses eslint.config.mjs (ESLint flat config).
+      #    The lint script is defined in package.json as:
+      #      "lint": "eslint"
+      # ----------------------------------------------------------
+      - name: Lint
+        run: pnpm lint
+
+      # ----------------------------------------------------------
+      # 6. Test
+      #    Runs Jest in --ci mode (non-interactive, exits non-zero
+      #    on failure). Test suite covers:
+      #      - Zod validation schemas  (app/lib/validations.ts)
+      #      - Class validator         (app/validators/class.validator.ts)
+      #      - Badge & SectionHeading  (app/components/ui/)
+      # ----------------------------------------------------------
+      - name: Test
+        run: pnpm test
+
+      # ----------------------------------------------------------
+      # 7. Production build
+      #    Verifies the Next.js app compiles successfully.
+      #    NEXT_TELEMETRY_DISABLED suppresses telemetry prompts.
+      # ----------------------------------------------------------
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
