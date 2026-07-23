@@ -67,8 +67,11 @@ export const bookingService = {
 
   // Implement booking cancellation
   async cancelBooking(id: string, userId: string, role: Role): Promise<any> {
-    // 1. Check if booking exists
-    const booking = await bookingRepository.findById(id);
+    // 1. Check if booking exists by booking ID or class ID
+    let booking = await bookingRepository.findById(id);
+    if (!booking) {
+      booking = await bookingRepository.findUniqueBooking(userId, id);
+    }
     if (!booking) {
       throw new NotFoundError(`Booking with ID ${id} does not exist.`);
     }
@@ -84,6 +87,6 @@ export const bookingService = {
     }
 
     // 4. Execute atomic update
-    return bookingRepository.cancelBookingWithSeatIncrement(id, booking.classId);
+    return bookingRepository.cancelBookingWithSeatIncrement(booking.id, booking.classId);
   }
 };

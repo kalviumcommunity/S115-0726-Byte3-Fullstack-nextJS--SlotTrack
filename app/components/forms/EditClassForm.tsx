@@ -13,6 +13,7 @@ interface EditClassFormProps {
     title: string;
     category: string;
     location: string;
+    detailedLocation?: string;
     startTime: string;
     endTime: string;
     date: string;
@@ -46,6 +47,7 @@ export default function EditClassForm({ initialClass, onSubmit, onCancel }: Edit
   const [title, setTitle] = useState(initialClass.title);
   const [category, setCategory] = useState(initialClass.category);
   const [location, setLocation] = useState(initialClass.location || LOCATIONS[0]);
+  const [detailedLocation, setDetailedLocation] = useState(initialClass.detailedLocation || "");
   const [date, setDate] = useState(initialClass.date);
   const [startTime, setStartTime] = useState(() => convert12hrTo24hr(initialClass.startTime));
   const [endTime, setEndTime] = useState(() => convert12hrTo24hr(initialClass.endTime));
@@ -92,6 +94,7 @@ export default function EditClassForm({ initialClass, onSubmit, onCancel }: Edit
       title,
       category,
       location,
+      detailedLocation: detailedLocation.trim() || undefined,
       date,
       startTime: formatTime12hr(startTime),
       endTime: formatTime12hr(endTime),
@@ -148,6 +151,15 @@ export default function EditClassForm({ initialClass, onSubmit, onCancel }: Edit
         </select>
         {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
       </div>
+
+      <Input
+        label="Venue / Detailed Location"
+        id="edit-class-detailed-location"
+        placeholder="e.g. Amanora Mall, 5th Floor, Hadapsar, Pune 411028"
+        value={detailedLocation}
+        onChange={(e) => setDetailedLocation(e.target.value)}
+        error={errors.detailedLocation}
+      />
 
       <Input
         label="Date"

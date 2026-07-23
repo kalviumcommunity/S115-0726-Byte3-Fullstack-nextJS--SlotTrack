@@ -11,6 +11,7 @@ interface CreateClassModalProps {
     title: string;
     category: string;
     location: string;
+    detailedLocation?: string;
     startTime: string;
     endTime: string;
     date: string;

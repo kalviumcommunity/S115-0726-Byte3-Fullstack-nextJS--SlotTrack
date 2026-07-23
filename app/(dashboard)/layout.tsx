@@ -141,21 +141,43 @@ export default function DashboardLayout({
     }
   }, [status, session]);
 
-  const toggleBookClass = async (classId: string) => {
-    const existingBooking = bookings.find((b) => b.classId === classId && b.status === "ACTIVE");
+  const toggleBookClass = async (classIdOrBookingId: string) => {
+    const existingBooking = bookings.find(
+      (b) => (b.classId === classIdOrBookingId || b.id === classIdOrBookingId) && b.status === "ACTIVE"
+    );
     if (existingBooking) {
       try {
         await cancelBooking(existingBooking.id);
         await fetchData();
       } catch (err: any) {
-        alert(err.message || "Failed to cancel booking");
+        try {
+          await cancelBooking(classIdOrBookingId);
+          await fetchData();
+        } catch (fallbackErr: any) {
+          alert(err?.message || fallbackErr?.message || "Failed to cancel booking");
+        }
       }
     } else {
-      try {
-        await bookClass(classId);
-        await fetchData();
-      } catch (err: any) {
-        alert(err.message || "Failed to book class");
+      const isAlreadyBooked = bookedClassIds.includes(classIdOrBookingId);
+      if (isAlreadyBooked) {
+        try {
+          await cancelBooking(classIdOrBookingId);
+          await fetchData();
+        } catch (err: any) {
+          alert(err?.message || "Failed to cancel booking");
+        }
+      } else {
+        try {
+          await bookClass(classIdOrBookingId);
+          await fetchData();
+        } catch (err: any) {
+          try {
+            await cancelBooking(classIdOrBookingId);
+            await fetchData();
+          } catch (cancErr: any) {
+            alert(err?.message || "Failed to book class");
+          }
+        }
       }
     }
   };
