@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "node .next/standalone/server.js",
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "db:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
