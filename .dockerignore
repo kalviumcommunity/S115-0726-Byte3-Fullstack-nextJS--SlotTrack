@@ -1,0 +1,44 @@
+# Node & dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Local Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Git & Repository
+.git
+.gitignore
+.github
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Documentation & Guidelines
+docs/
+README.md
+AGENTS.md
+CLAUDE.md
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# TypeScript cache
+*.tsbuildinfo
