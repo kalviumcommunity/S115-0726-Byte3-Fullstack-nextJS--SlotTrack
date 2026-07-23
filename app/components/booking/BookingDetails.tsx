@@ -9,6 +9,7 @@ interface BookingDetailsProps {
     time?: string;
     date?: string;
     location?: string;
+    detailedLocation?: string;
     bookedSeats?: number;
     capacity?: number;
 }
@@ -20,6 +21,7 @@ export default function BookingDetails({
     time = "09:00 AM - 10:00 AM",
     date = "10 July, 2026",
     location = "Studio 2, Main floor",
+    detailedLocation,
     bookedSeats = 20,
     capacity = 25,
 }: BookingDetailsProps) {
@@ -59,8 +61,8 @@ export default function BookingDetails({
                     </div>
 
                     <div className="flex items-center gap-3 text-text-secondary">
-                        <MapPin className="h-5 w-5 text-text-secondary" />
-                        <span className="text-sm font-medium text-text-primary">{location}</span>
+                        <MapPin className="h-5 w-5 text-text-secondary shrink-0" />
+                        <span className="text-sm font-medium text-text-primary">{detailedLocation || location}</span>
                     </div>
 
                     <div className="flex items-center gap-3 text-text-secondary">

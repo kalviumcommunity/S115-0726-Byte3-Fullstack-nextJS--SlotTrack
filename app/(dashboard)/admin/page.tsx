@@ -64,6 +64,7 @@ const mapDbClassToUI = (cls: any): FitnessClass => {
     capacity: cls.capacity,
     availableSeats: cls.availableSeats,
     location: cls.location,
+    detailedLocation: cls.detailedLocation,
     price: cls.price,
   };
 };
@@ -158,6 +159,7 @@ export default function AdminDashboardPage() {
     title: string;
     category: string;
     location: string;
+    detailedLocation?: string;
     startTime: string;
     endTime: string;
     date: string;
@@ -174,9 +176,10 @@ export default function AdminDashboardPage() {
         startTime: startISO,
         endTime: endISO,
         capacity: Number(data.capacity),
-        instructor: "Senior Instructor",
+        instructor: session?.user?.name || "Instructor",
         description: `Join this premium ${data.title} class to boost your fitness, flexibility, and general well-being.`,
         location: data.location,
+        detailedLocation: data.detailedLocation,
         price: data.price,
         imageUrl: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop",
       });
@@ -193,6 +196,7 @@ export default function AdminDashboardPage() {
     title: string;
     category: string;
     location: string;
+    detailedLocation?: string;
     startTime: string;
     endTime: string;
     date: string;
@@ -207,6 +211,7 @@ export default function AdminDashboardPage() {
         title: data.title,
         category: data.category,
         location: data.location,
+        detailedLocation: data.detailedLocation,
         startTime: startISO,
         endTime: endISO,
         capacity: Number(data.capacity),
@@ -318,12 +323,15 @@ export default function AdminDashboardPage() {
                     {getCategoryIcon(cls.category || cls.title)}
                   </div>
 
-                  <div className="flex flex-col gap-1.5 w-full">
+                  <div className="flex flex-col gap-1 w-full">
                     <h3 className="font-bold text-lg text-text-primary font-sora truncate leading-tight" title={cls.title}>
                       {cls.title}
                     </h3>
                     <p className="text-xs font-semibold text-text-secondary font-manrope">
                       {cls.startTime} - {cls.endTime}
+                    </p>
+                    <p className="text-[11px] font-semibold text-text-secondary font-manrope truncate" title={cls.detailedLocation || cls.location}>
+                      📍 {cls.detailedLocation || cls.location}
                     </p>
                     <p className="text-xs font-bold text-text-primary font-manrope">
                       {booked}/{cls.capacity} Booked • ₹{cls.price}
@@ -349,6 +357,7 @@ export default function AdminDashboardPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Class Name</TableHead>
+                <TableHead>Location</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Capacity</TableHead>
@@ -370,6 +379,9 @@ export default function AdminDashboardPage() {
                         <span className="font-bold text-text-primary font-sora">{cls.title}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="font-semibold text-text-secondary font-manrope text-xs max-w-[150px] truncate" title={cls.detailedLocation || cls.location}>
+                      {cls.detailedLocation || cls.location}
+                    </TableCell>
                     <TableCell className="font-semibold text-text-secondary font-manrope">
                       {formatDisplayDate(cls.date)}
                     </TableCell>
@@ -382,7 +394,7 @@ export default function AdminDashboardPage() {
                     <TableCell className="font-semibold text-text-secondary font-manrope">
                       {booked}
                     </TableCell>
-                    <TableCell className="font-semibold text-text-primary font-manrope font-semibold">
+                    <TableCell className="font-semibold text-text-primary font-manrope">
                       ₹{cls.price}
                     </TableCell>
                     <TableCell className="text-right">

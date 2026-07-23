@@ -46,10 +46,17 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    const role = (session.user as { role?: string }).role || '';
+    const user = session.user as { id?: string; name?: string; role?: string };
+    const role = user.role || '';
     const body = await request.json();
 
-    const result = await classController.createClass(body, role);
+    const payload = {
+      ...body,
+      instructorId: user.id || body.instructorId,
+      instructor: body.instructor || user.name || 'Instructor',
+    };
+
+    const result = await classController.createClass(payload, role);
     return NextResponse.json(
       {
         success: true,
