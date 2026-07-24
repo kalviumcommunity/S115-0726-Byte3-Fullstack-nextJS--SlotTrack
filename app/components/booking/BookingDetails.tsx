@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { Clock, Calendar, MapPin, Users } from "lucide-react";
+import { Clock, Calendar, MapPin, Users, User } from "lucide-react";
 
 interface BookingDetailsProps {
     title?: string;
@@ -12,6 +12,7 @@ interface BookingDetailsProps {
     detailedLocation?: string;
     bookedSeats?: number;
     capacity?: number;
+    instructorName?: string;
 }
 
 export default function BookingDetails({
@@ -24,6 +25,7 @@ export default function BookingDetails({
     detailedLocation,
     bookedSeats = 20,
     capacity = 25,
+    instructorName,
 }: BookingDetailsProps) {
     // Use a high-quality placeholder image if next/image cannot find the path
     const displayImage = image.startsWith("/") ? image : "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=600";
@@ -50,6 +52,15 @@ export default function BookingDetails({
                 </h2>
 
                 <div className="space-y-3.5">
+                    {instructorName && (
+                        <div className="flex items-center gap-3 text-text-secondary">
+                            <User className="h-5 w-5 text-text-secondary" />
+                            <span className="text-sm font-medium text-text-primary">
+                                Instructor: {instructorName}
+                            </span>
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-3 text-text-secondary">
                         <Clock className="h-5 w-5 text-text-secondary" />
                         <span className="text-sm font-medium text-text-primary">{time}</span>

@@ -16,13 +16,13 @@ export default function ContactCard({
             style={{ backgroundColor: "#72BF6A" }}
         >
             {/* Left: Support text */}
-            <div className="flex flex-col justify-center px-8 py-7 flex-1">
+            <div className="flex flex-col justify-center px-8 pt-5 pb-7 flex-1">
                 <p
-                    className="text-white uppercase tracking-widest mb-1"
+                    className="text-white uppercase tracking-widest mb-3"
                     style={{
                         fontFamily: "Manrope, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "13px",
+                        fontWeight: 800,
+                        fontSize: "18px",
                         letterSpacing: "0.12em",
                     }}
                 >
@@ -33,9 +33,9 @@ export default function ContactCard({
                     style={{
                         fontFamily: "Manrope, sans-serif",
                         fontWeight: 500,
-                        fontSize: "13px",
-                        maxWidth: "280px",
+                        fontSize: "16px",
                         opacity: 0.95,
+                        whiteSpace: "nowrap",
                     }}
                 >
                     For any issues or queries related to this class, contact Us.
@@ -73,7 +73,7 @@ export default function ContactCard({
                         style={{
                             fontFamily: "Manrope, sans-serif",
                             fontWeight: 600,
-                            fontSize: "15px",
+                            fontSize: "17px",
                         }}
                     >
                         {phone}
@@ -99,7 +99,7 @@ export default function ContactCard({
                         style={{
                             fontFamily: "Manrope, sans-serif",
                             fontWeight: 600,
-                            fontSize: "15px",
+                            fontSize: "17px",
                         }}
                     >
                         {email}
