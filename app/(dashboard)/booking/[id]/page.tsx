@@ -5,7 +5,6 @@ import { ArrowLeft } from "lucide-react";
 import BookingDetails from "@/app/components/booking/BookingDetails";
 import BookingWidget from "@/app/components/booking/BookingWidget";
 import AboutClass from "@/app/components/booking/AboutClass";
-import InstructorCard from "@/app/components/cards/InstructorCard";
 import ContactCard from "@/app/components/booking/ContactCard";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { getClassById } from "@/app/lib/api/classes";
@@ -140,6 +139,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
               detailedLocation={currentClass.detailedLocation || currentClass.location}
               bookedSeats={currentBookedSeats}
               capacity={currentClass.capacity}
+              instructorName={instructorName}
             />
           </div>
 
@@ -165,15 +165,6 @@ export default function DynamicBookingPage({ params }: PageProps) {
           intensity="Medium"
           equipment="Yoga Mat, Towel, Water"
           capacity={currentClass.capacity}
-        />
-      </div>
-
-      {/* Instructor Section Card */}
-      <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
-        <InstructorCard
-          name={instructorName}
-          role={instructorRole}
-          experience={instructorExp}
         />
       </div>
 
