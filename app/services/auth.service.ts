@@ -28,7 +28,7 @@ export const authService = {
       }
 
       // Fixed list of valid Employee IDs
-      const VALID_EMPLOYEE_IDS = ['EMP-001', 'EMP-002', 'EMP-003', 'EMP-004', 'EMP-005', 'EMP-12345', 'EMP-67890'];
+      const VALID_EMPLOYEE_IDS = ['EMP-001', 'EMP-002', 'EMP-003', 'EMP-004', 'EMP-005', 'EMP-006', 'EMP-007', 'EMP-008', 'EMP-009', 'EMP-010', 'EMP-12345', 'EMP-67890'];
       if (!VALID_EMPLOYEE_IDS.includes(employeeId)) {
         const error = new Error('This is not a valid Employee ID') as Error & { status?: number };
         error.status = 400;

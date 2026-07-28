@@ -34,11 +34,8 @@ export const bookingService = {
 
   // Implement listing bookings filtered by user and role
   async getBookings(userId: string, role: Role): Promise<any[]> {
-    if (role === Role.ADMIN) {
-      return bookingRepository.findAll();
-    } else {
-      return bookingRepository.findByUserId(userId);
-    }
+    // Return only the logged-in user's own bookings for their personal schedule sidebar.
+    return bookingRepository.findByUserId(userId);
   },
 
   // Implement getting paginated booking history for a user/admin
@@ -47,11 +44,8 @@ export const bookingService = {
     const skip = (page - 1) * limit;
 
     let records: any[], total: number;
-    if (role === Role.ADMIN) {
-      [records, total] = await bookingRepository.findPastClassesPaginated(skip, limit);
-    } else {
-      [records, total] = await bookingRepository.findByUserIdPaginated(userId, skip, limit);
-    }
+    // Return only the logged-in user's own bookings for their personal profile history view.
+    [records, total] = await bookingRepository.findByUserIdPaginated(userId, skip, limit);
 
     return {
       records,

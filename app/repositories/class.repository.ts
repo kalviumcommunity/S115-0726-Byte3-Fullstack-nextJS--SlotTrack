@@ -3,15 +3,21 @@ import { FitnessClass } from '../generated/prisma';
 
 export const classRepository = {
   // Find all fitness classes matching filters, ordered by startTime ascending
-  async findAll(filters?: { category?: string; location?: string }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
+  async findAll(filters?: { category?: string; location?: string; instructorId?: string; includePast?: boolean }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
     const where: any = {};
 
-    // Exclude past classes prior to today (00:00:00)
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-    where.startTime = {
-      gte: startOfToday,
-    };
+    // Exclude past classes prior to today (00:00:00) unless explicitly requested
+    if (!filters?.includePast) {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      where.startTime = {
+        gte: startOfToday,
+      };
+    }
+
+    if (filters?.instructorId) {
+      where.instructorId = filters.instructorId;
+    }
 
     if (filters?.category) {
       where.category = filters.category;
