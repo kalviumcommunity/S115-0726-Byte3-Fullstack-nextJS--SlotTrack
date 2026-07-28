@@ -103,7 +103,8 @@ export default function AdminDashboardPage() {
   const fetchAdminClasses = async () => {
     setLoading(true);
     try {
-      const data = await getClasses();
+      const instructorId = (session?.user as any)?.id;
+      const data = await getClasses({ instructorId, includePast: true });
       setClasses(data.map(mapDbClassToUI));
     } catch (err) {
       console.error("Failed to load admin classes", err);

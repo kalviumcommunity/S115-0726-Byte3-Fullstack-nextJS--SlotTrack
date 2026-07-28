@@ -4,7 +4,7 @@ import { FitnessClass } from '../generated/prisma';
 
 export const classService = {
   // Retrieve all fitness classes with optional filters
-  async getClasses(filters?: { category?: string; location?: string }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
+  async getClasses(filters?: { category?: string; location?: string; instructorId?: string; includePast?: boolean }): Promise<Omit<FitnessClass, 'createdAt' | 'updatedAt'>[]> {
     return classRepository.findAll(filters);
   },
 

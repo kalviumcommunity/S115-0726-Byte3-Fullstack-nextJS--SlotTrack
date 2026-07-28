@@ -16,8 +16,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || undefined;
     const location = searchParams.get('location') || undefined;
+    const instructorId = searchParams.get('instructorId') || undefined;
+    const includePast = searchParams.get('includePast') === 'true';
 
-    const result = await classController.getClasses({ category, location });
+    const result = await classController.getClasses({ category, location, instructorId, includePast });
     return NextResponse.json({
       success: true,
       data: result,

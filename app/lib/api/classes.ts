@@ -1,13 +1,19 @@
 import { request } from './client';
 import { FitnessClassType } from '@/app/types/fitness-class';
 
-export async function getClasses(filters?: { category?: string; location?: string }): Promise<FitnessClassType[]> {
+export async function getClasses(filters?: { category?: string; location?: string; instructorId?: string; includePast?: boolean }): Promise<FitnessClassType[]> {
   const params = new URLSearchParams();
   if (filters?.category && filters.category !== 'All') {
     params.append('category', filters.category);
   }
   if (filters?.location && filters.location !== 'All') {
     params.append('location', filters.location);
+  }
+  if (filters?.instructorId) {
+    params.append('instructorId', filters.instructorId);
+  }
+  if (filters?.includePast) {
+    params.append('includePast', 'true');
   }
   const queryString = params.toString();
   const url = `/api/classes${queryString ? `?${queryString}` : ''}`;
