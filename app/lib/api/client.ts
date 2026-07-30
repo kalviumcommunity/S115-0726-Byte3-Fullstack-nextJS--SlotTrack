@@ -4,6 +4,7 @@ export async function request<T>(
   url: string,
   options?: RequestInit
 ): Promise<T> {
+  const start = typeof window !== 'undefined' ? performance.now() : 0;
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -11,6 +12,11 @@ export async function request<T>(
     },
     ...options,
   });
+
+  const duration = typeof window !== 'undefined' ? performance.now() - start : 0;
+  if (typeof window !== 'undefined') {
+    console.log(`[PERF_CLIENT_API] ${options?.method || 'GET'} ${url} - ${duration.toFixed(2)}ms (status ${res.status})`);
+  }
 
   let json: ApiResponse<T>;
   try {

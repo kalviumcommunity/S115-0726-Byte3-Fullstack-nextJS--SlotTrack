@@ -1,16 +1,21 @@
 import prisma from '../lib/prisma';
 import { User } from '../generated/prisma';
+import { measureSpan } from '../lib/perf-logger';
 
 export const authRepository = {
   async findByEmail(email: string): Promise<User | null> {
-    return prisma.user.findUnique({
-      where: { email },
+    return measureSpan('REPOSITORY', 'authRepository.findByEmail', async () => {
+      return prisma.user.findUnique({
+        where: { email },
+      });
     });
   },
 
   async findByEmployeeId(employeeId: string): Promise<User | null> {
-    return prisma.user.findUnique({
-      where: { employeeId },
+    return measureSpan('REPOSITORY', 'authRepository.findByEmployeeId', async () => {
+      return prisma.user.findUnique({
+        where: { employeeId },
+      });
     });
   },
 
@@ -23,16 +28,18 @@ export const authRepository = {
     gender?: string;
     age?: number | null;
   }): Promise<User> {
-    return prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password: data.passwordHash,
-        role: data.role || 'MEMBER',
-        employeeId: data.employeeId || null,
-        gender: data.gender || null,
-        age: data.age !== undefined && data.age !== null ? Number(data.age) : null,
-      },
+    return measureSpan('REPOSITORY', 'authRepository.createUser', async () => {
+      return prisma.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          password: data.passwordHash,
+          role: data.role || 'MEMBER',
+          employeeId: data.employeeId || null,
+          gender: data.gender || null,
+          age: data.age !== undefined && data.age !== null ? Number(data.age) : null,
+        },
+      });
     });
   },
 };

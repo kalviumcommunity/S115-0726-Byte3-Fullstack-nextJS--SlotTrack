@@ -1,0 +1,130 @@
+[
+  {
+    "actionName": "Member Login",
+    "endpoint": "/api/auth/login",
+    "method": "POST",
+    "ttfbMs": 1424.7,
+    "totalDurationMs": 1548.59,
+    "payloadSize": 251,
+    "layeredBreakdown": {
+      "middlewareMs": 2.1,
+      "controllerMs": 501.1,
+      "serviceMs": 498.5,
+      "repositoryMs": 382.1,
+      "dbQueryCount": 1,
+      "dbTotalMs": 380
+    }
+  },
+  {
+    "actionName": "Member Register",
+    "endpoint": "/api/auth/register",
+    "method": "POST",
+    "ttfbMs": 423.48,
+    "totalDurationMs": 460.3,
+    "payloadSize": 268,
+    "layeredBreakdown": {
+      "middlewareMs": 3.5,
+      "controllerMs": 1854.5,
+      "serviceMs": 1850.1,
+      "repositoryMs": 1735,
+      "dbQueryCount": 2,
+      "dbTotalMs": 1730
+    }
+  },
+  {
+    "actionName": "Get Available Classes",
+    "endpoint": "/api/classes?location=Bangalore",
+    "method": "GET",
+    "ttfbMs": 268.28,
+    "totalDurationMs": 291.61,
+    "payloadSize": 26,
+    "layeredBreakdown": {
+      "middlewareMs": 1.2,
+      "controllerMs": 192.9,
+      "serviceMs": 191.5,
+      "repositoryMs": 188,
+      "dbQueryCount": 1,
+      "dbTotalMs": 185
+    }
+  },
+  {
+    "actionName": "Book Class",
+    "endpoint": "/api/bookings",
+    "method": "POST",
+    "ttfbMs": 675.68,
+    "totalDurationMs": 734.43,
+    "payloadSize": 91,
+    "layeredBreakdown": {
+      "middlewareMs": 2.5,
+      "controllerMs": 1007.6,
+      "serviceMs": 1005.1,
+      "repositoryMs": 998.2,
+      "dbQueryCount": 7,
+      "dbTotalMs": 980
+    }
+  },
+  {
+    "actionName": "Get Active Bookings",
+    "endpoint": "/api/bookings",
+    "method": "GET",
+    "ttfbMs": 363.4,
+    "totalDurationMs": 395,
+    "payloadSize": 8990,
+    "layeredBreakdown": {
+      "middlewareMs": 1.5,
+      "controllerMs": 312.8,
+      "serviceMs": 311,
+      "repositoryMs": 308.5,
+      "dbQueryCount": 1,
+      "dbTotalMs": 305
+    }
+  },
+  {
+    "actionName": "Get Booking History",
+    "endpoint": "/api/bookings/history?page=1&limit=20",
+    "method": "GET",
+    "ttfbMs": 676.4,
+    "totalDurationMs": 735.22,
+    "payloadSize": 8449,
+    "layeredBreakdown": {
+      "middlewareMs": 1.8,
+      "controllerMs": 372,
+      "serviceMs": 370.2,
+      "repositoryMs": 366.5,
+      "dbQueryCount": 2,
+      "dbTotalMs": 360
+    }
+  },
+  {
+    "actionName": "Cancel Booking",
+    "endpoint": "/api/bookings/cms7alc570003n098ir6ak7to/cancel",
+    "method": "POST",
+    "ttfbMs": 33.09,
+    "totalDurationMs": 35.97,
+    "payloadSize": 16566,
+    "layeredBreakdown": {
+      "middlewareMs": 2.2,
+      "controllerMs": 499,
+      "serviceMs": 497.1,
+      "repositoryMs": 492,
+      "dbQueryCount": 5,
+      "dbTotalMs": 485
+    }
+  },
+  {
+    "actionName": "Admin Create Class",
+    "endpoint": "/api/classes",
+    "method": "POST",
+    "ttfbMs": 27.33,
+    "totalDurationMs": 29.71,
+    "payloadSize": 40,
+    "layeredBreakdown": {
+      "middlewareMs": 2,
+      "controllerMs": 809.8,
+      "serviceMs": 809.2,
+      "repositoryMs": 806.4,
+      "dbQueryCount": 1,
+      "dbTotalMs": 800
+    }
+  }
+]
