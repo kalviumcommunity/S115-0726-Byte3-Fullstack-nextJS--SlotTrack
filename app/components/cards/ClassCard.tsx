@@ -17,6 +17,7 @@ export interface ClassCardProps {
   detailedLocation?: string;
   price: number;
   isBooked?: boolean;
+  isPending?: boolean;
   onBookToggle?: (id: string) => void;
 }
 
@@ -31,6 +32,7 @@ export default function ClassCard({
   detailedLocation,
   price,
   isBooked = false,
+  isPending = false,
   onBookToggle,
 }: ClassCardProps) {
   const router = useRouter();
@@ -54,10 +56,15 @@ export default function ClassCard({
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-4 left-4 z-10 flex gap-2">
           <Badge className="bg-white/95 text-[#111827] shadow-sm backdrop-blur-xs">
             {category}
           </Badge>
+          {isPending && (
+            <Badge className="bg-blue-500/90 text-white shadow-sm backdrop-blur-xs animate-pulse">
+              Syncing...
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -104,16 +111,17 @@ export default function ClassCard({
         <div className="w-full mt-2">
           <Button
             variant={isBooked ? "danger" : "primary"}
-            className="w-full text-base font-bold py-3"
+            className="w-full text-base font-bold py-3 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={isPending}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (onBookToggle) {
+              if (onBookToggle && !isPending) {
                 onBookToggle(id);
               }
             }}
           >
-            {isBooked ? "Cancel Booking" : "Book Now"}
+            {isPending ? "Syncing..." : isBooked ? "Cancel Booking" : "Book Now"}
           </Button>
         </div>
       </div>

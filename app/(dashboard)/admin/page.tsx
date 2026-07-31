@@ -16,6 +16,8 @@ import { cn } from "@/app/lib/utils";
 import { getClasses, createClass, updateClass, deleteClass } from "@/app/lib/api/classes";
 import Link from "next/link";
 
+import { useToast } from "@/app/components/ui/Toast";
+
 const ITEMS_PER_PAGE = 5;
 
 const convertToISO = (dateStr: string, timeStr: string) => {
@@ -92,6 +94,7 @@ export function getCategoryIcon(categoryOrTitle: string) {
 export default function AdminDashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [classes, setClasses] = useState<FitnessClass[]>([]);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -99,6 +102,7 @@ export default function AdminDashboardPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [pendingMutations, setPendingMutations] = useState<Set<string>>(new Set());
 
   const fetchAdminClasses = async () => {
     setLoading(true);
@@ -167,11 +171,38 @@ export default function AdminDashboardPage() {
     capacity: number;
     price: number;
   }) => {
+    // Close modal immediately
+    setIsCreateOpen(false);
+
+    const tempId = `temp-class-${Date.now()}`;
+    const tempClass: FitnessClass = {
+      id: tempId,
+      title: data.title,
+      category: data.category,
+      instructor: session?.user?.name || "Instructor",
+      startTime: data.startTime,
+      endTime: data.endTime,
+      date: data.date,
+      capacity: Number(data.capacity),
+      availableSeats: Number(data.capacity),
+      location: data.location,
+      detailedLocation: data.detailedLocation,
+      price: Number(data.price),
+      isSyncing: true,
+    };
+
+    // Save snapshot before mutation
+    const prevClasses = [...classes];
+
+    // Optimistic update
+    setClasses((prev) => [tempClass, ...prev]);
+    setPendingMutations((prev) => new Set(prev).add(tempId));
+
     try {
       const startISO = convertToISO(data.date, data.startTime);
       const endISO = convertToISO(data.date, data.endTime);
       
-      await createClass({
+      const created = await createClass({
         title: data.title,
         category: data.category,
         startTime: startISO,
@@ -185,10 +216,21 @@ export default function AdminDashboardPage() {
         imageUrl: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=600&auto=format&fit=crop",
       });
       
-      setIsCreateOpen(false);
-      await fetchAdminClasses();
+      const mapped = mapDbClassToUI(created);
+      setClasses((prev) => prev.map((c) => (c.id === tempId ? mapped : c)));
     } catch (err: any) {
-      alert(err.message || "Failed to create class");
+      // Rollback snapshot on failure
+      setClasses(prevClasses);
+      toast.error(
+        "Class creation failed",
+        err?.message || "Your class could not be created. Please try again."
+      );
+    } finally {
+      setPendingMutations((prev) => {
+        const next = new Set(prev);
+        next.delete(tempId);
+        return next;
+      });
     }
   };
 
@@ -204,11 +246,40 @@ export default function AdminDashboardPage() {
     capacity: number;
     price: number;
   }) => {
+    if (pendingMutations.has(data.id)) return;
+
+    // Close modal immediately
+    setEditingClass(null);
+
+    // Save snapshot before mutation
+    const prevClasses = [...classes];
+
+    const currentItem = classes.find((c) => c.id === data.id);
+    if (!currentItem) return;
+
+    const updatedOptimisticClass: FitnessClass = {
+      ...currentItem,
+      title: data.title,
+      category: data.category,
+      location: data.location,
+      detailedLocation: data.detailedLocation,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      date: data.date,
+      capacity: Number(data.capacity),
+      price: Number(data.price),
+      isSyncing: true,
+    };
+
+    // Optimistic update
+    setClasses((prev) => prev.map((cls) => (cls.id === data.id ? updatedOptimisticClass : cls)));
+    setPendingMutations((prev) => new Set(prev).add(data.id));
+
     try {
       const startISO = convertToISO(data.date, data.startTime);
       const endISO = convertToISO(data.date, data.endTime);
 
-      await updateClass(data.id, {
+      const updated = await updateClass(data.id, {
         title: data.title,
         category: data.category,
         location: data.location,
@@ -219,25 +290,57 @@ export default function AdminDashboardPage() {
         price: data.price,
       });
 
-      setEditingClass(null);
-      await fetchAdminClasses();
+      const mapped = mapDbClassToUI(updated);
+      setClasses((prev) => prev.map((cls) => (cls.id === data.id ? mapped : cls)));
     } catch (err: any) {
-      alert(err.message || "Failed to update class");
+      // Rollback snapshot on failure
+      setClasses(prevClasses);
+      toast.error(
+        "Class update failed",
+        err?.message || "Your class could not be updated. Please try again."
+      );
+    } finally {
+      setPendingMutations((prev) => {
+        const next = new Set(prev);
+        next.delete(data.id);
+        return next;
+      });
     }
   };
 
   const handleDeleteClass = async (id: string) => {
+    if (pendingMutations.has(id)) return;
+
     if (confirm("Are you sure you want to delete this class?")) {
+      // Save snapshot before mutation
+      const prevClasses = [...classes];
+
+      // Optimistically remove class
+      const updatedClasses = classes.filter((cls) => cls.id !== id);
+      setClasses(updatedClasses);
+
+      const updatedTotalPages = Math.ceil(updatedClasses.length / ITEMS_PER_PAGE);
+      if (currentPage > updatedTotalPages && updatedTotalPages > 0) {
+        setCurrentPage(updatedTotalPages);
+      }
+
+      setPendingMutations((prev) => new Set(prev).add(id));
+
       try {
         await deleteClass(id);
-        const updatedClasses = classes.filter((cls) => cls.id !== id);
-        const updatedTotalPages = Math.ceil(updatedClasses.length / ITEMS_PER_PAGE);
-        if (currentPage > updatedTotalPages && updatedTotalPages > 0) {
-          setCurrentPage(updatedTotalPages);
-        }
-        await fetchAdminClasses();
       } catch (err: any) {
-        alert(err.message || "Failed to delete class");
+        // Rollback snapshot on failure
+        setClasses(prevClasses);
+        toast.error(
+          "Class deletion failed",
+          err?.message || "The class could not be deleted. Please try again."
+        );
+      } finally {
+        setPendingMutations((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
       }
     }
   };
@@ -334,8 +437,13 @@ export default function AdminDashboardPage() {
                     <p className="text-[11px] font-semibold text-text-secondary font-manrope truncate" title={cls.detailedLocation || cls.location}>
                       📍 {cls.detailedLocation || cls.location}
                     </p>
-                    <p className="text-xs font-bold text-text-primary font-manrope">
-                      {booked}/{cls.capacity} Booked • ₹{cls.price}
+                    <p className="text-xs font-bold text-text-primary font-manrope flex items-center justify-between">
+                      <span>{booked}/{cls.capacity} Booked • ₹{cls.price}</span>
+                      {cls.isSyncing && (
+                        <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded animate-pulse">
+                          Syncing...
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -377,7 +485,14 @@ export default function AdminDashboardPage() {
                         <div className="flex items-center justify-center size-9 rounded-lg bg-bg-base text-text-primary border border-border shadow-[0px_1px_4px_0px_rgba(0,0,0,0.03)]">
                           {getCategoryIcon(cls.category || cls.title)}
                         </div>
-                        <span className="font-bold text-text-primary font-sora">{cls.title}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-text-primary font-sora">{cls.title}</span>
+                          {cls.isSyncing && (
+                            <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded animate-pulse">
+                              Syncing...
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold text-text-secondary font-manrope text-xs max-w-[150px] truncate" title={cls.detailedLocation || cls.location}>

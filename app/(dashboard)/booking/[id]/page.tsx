@@ -17,7 +17,7 @@ interface PageProps {
 
 export default function DynamicBookingPage({ params }: PageProps) {
   const { id } = use(params);
-  const { bookedClassIds, toggleBookClass } = useDashboard();
+  const { bookedClassIds, toggleBookClass, getOptimisticAvailableSeats, pendingMutations } = useDashboard();
   const [currentClass, setCurrentClass] = useState<FitnessClassType | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
       }
     };
     fetchClass();
-  }, [id, bookedClassIds]); // Re-fetch on booking update to keep availableSeats in sync
+  }, [id]);
 
   if (loading) {
     return (
@@ -58,7 +58,8 @@ export default function DynamicBookingPage({ params }: PageProps) {
   }
 
   const isCurrentlyBooked = bookedClassIds.includes(id);
-  const currentAvailableSeats = currentClass.availableSeats;
+  const isPending = pendingMutations.has(id);
+  const currentAvailableSeats = getOptimisticAvailableSeats(id, currentClass.availableSeats);
   const currentBookedSeats = currentClass.capacity - currentAvailableSeats;
 
   const start = new Date(currentClass.startTime);
@@ -152,6 +153,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
               price={currentClass.price}
               onBook={handleBookingAction}
               isBooked={isCurrentlyBooked}
+              isLoading={isPending}
             />
           </div>
         </div>

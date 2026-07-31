@@ -10,14 +10,13 @@ import { getClasses } from "@/app/lib/api/classes";
 import { FitnessClassType } from "@/app/types/fitness-class";
 
 export default function UserDashboardPage() {
-  const { bookedClassIds, bookings, toggleBookClass, selectedLocation } = useDashboard();
+  const { bookedClassIds, bookings, toggleBookClass, selectedLocation, pendingMutations, getOptimisticAvailableSeats } = useDashboard();
   const [classes, setClasses] = useState<FitnessClassType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchClasses = async () => {
-      // Avoid showing screen-wide loading spinner if classes are already loaded
       if (classes.length === 0) {
         setLoading(true);
       }
@@ -31,7 +30,7 @@ export default function UserDashboardPage() {
       }
     };
     fetchClasses();
-  }, [selectedLocation, bookedClassIds]);
+  }, [selectedLocation]);
 
   // Combine booking status with our class properties
   const processedClasses: ClassCardProps[] = classes.map((cls) => {
@@ -64,6 +63,8 @@ export default function UserDashboardPage() {
       detailedLocation: cls.detailedLocation || cls.location,
       price: cls.price,
       isBooked: bookedClassIds.includes(cls.id),
+      isPending: pendingMutations.has(cls.id),
+      availableSeats: getOptimisticAvailableSeats(cls.id, cls.availableSeats),
     };
   });
 

@@ -12,4 +12,5 @@ export interface FitnessClass {
   location: string;
   detailedLocation?: string;
   price: number;
+  isSyncing?: boolean;
 }
