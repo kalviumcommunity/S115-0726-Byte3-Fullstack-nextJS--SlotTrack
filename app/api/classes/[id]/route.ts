@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/lib/auth';
+import { getAuthenticatedUser } from '@/app/lib/auth-helper';
 import { classController } from '@/app/controllers/class.controller';
 
 export const dynamic = 'force-dynamic';
@@ -44,17 +43,16 @@ export async function PATCH(
     const { id } = await params;
 
     // 1. Authentication check
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
       const error = new Error('Unauthorized') as Error & { status?: number };
       error.status = 401;
       throw error;
     }
 
-    const role = (session.user as { role?: string }).role || '';
     const body = await request.json();
 
-    const result = await classController.updateClass(id, body, role);
+    const result = await classController.updateClass(id, body, user.role);
     return NextResponse.json({
       success: true,
       data: result,
@@ -81,15 +79,14 @@ export async function DELETE(
     const { id } = await params;
 
     // 1. Authentication check
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
       const error = new Error('Unauthorized') as Error & { status?: number };
       error.status = 401;
       throw error;
     }
 
-    const role = (session.user as { role?: string }).role || '';
-    const result = await classController.deleteClass(id, role);
+    const result = await classController.deleteClass(id, user.role);
     return NextResponse.json({
       success: true,
       data: result,

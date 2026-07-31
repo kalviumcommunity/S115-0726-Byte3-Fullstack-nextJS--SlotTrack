@@ -1,22 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/lib/auth';
+import { getAuthenticatedUser } from '@/app/lib/auth-helper';
 import { userController } from '@/app/controllers/user.controller';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
       const error = new Error('Unauthorized');
       (error as any).status = 401;
       throw error;
     }
 
-    const userId = (session.user as any).id;
-    const email = session.user?.email || undefined;
-    const result = await userController.getProfile(userId, email);
+    const result = await userController.getProfile(user.userId);
 
     return NextResponse.json({
       success: true,
@@ -36,16 +33,15 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
       const error = new Error('Unauthorized');
       (error as any).status = 401;
       throw error;
     }
 
-    const userId = (session.user as any).id;
     const body = await request.json();
-    const result = await userController.updateProfile(userId, body);
+    const result = await userController.updateProfile(user.userId, body);
 
     return NextResponse.json({
       success: true,

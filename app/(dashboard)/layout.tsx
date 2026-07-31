@@ -78,14 +78,25 @@ export default function DashboardLayout({
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (includeProfile = true) => {
     try {
-      await fetchUserProfile();
-      const activeBookings = await getBookings();
-      setBookings(activeBookings);
-      setBookedClassIds(activeBookings.filter((b) => b.status === "ACTIVE").map((b) => b.classId));
+      const [dbUser, activeBookings, historyData] = await Promise.all([
+        includeProfile ? getProfile().catch(() => null) : Promise.resolve(null),
+        getBookings(),
+        getBookingHistory(1, 20),
+      ]);
 
-      const historyData = await getBookingHistory(1, 20);
+      if (dbUser) {
+        if (dbUser.name) setProfileName(dbUser.name);
+        if (dbUser.age !== undefined && dbUser.age !== null) setUserAge(dbUser.age);
+        if (dbUser.gender) setUserGender(dbUser.gender);
+      }
+
+      if (activeBookings) {
+        setBookings(activeBookings);
+        setBookedClassIds(activeBookings.filter((b: any) => b.status === "ACTIVE").map((b: any) => b.classId));
+      }
+
       const records = historyData?.records || [];
       const mapped = records
         .filter((b: any) => {
@@ -140,7 +151,7 @@ export default function DashboardLayout({
     if (status === "unauthenticated") {
       router.replace("/login");
     } else if (status === "authenticated") {
-      fetchData();
+      fetchData(true);
       if (session?.user?.name) {
         setProfileName(session.user.name);
       }
