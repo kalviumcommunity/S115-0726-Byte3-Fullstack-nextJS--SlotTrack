@@ -80,12 +80,6 @@ export const classRepository = {
 
       return classes.map((cls) => {
         const safeAvailable = Math.min(cls.capacity, Math.max(0, cls.availableSeats));
-        if (cls.availableSeats !== safeAvailable) {
-          prisma.fitnessClass.update({
-            where: { id: cls.id },
-            data: { availableSeats: safeAvailable },
-          }).catch(() => {});
-        }
         return {
           ...cls,
           availableSeats: safeAvailable,
@@ -116,14 +110,9 @@ export const classRepository = {
 
       if (!fitnessClass) return null;
 
-      if (!fitnessClass.instructorUser && (fitnessClass.instructorId || fitnessClass.instructor)) {
-        const user = await prisma.user.findFirst({
-          where: {
-            OR: [
-              ...(fitnessClass.instructorId ? [{ id: fitnessClass.instructorId }] : []),
-              { name: { equals: fitnessClass.instructor, mode: 'insensitive' } },
-            ],
-          },
+      if (!fitnessClass.instructorUser && fitnessClass.instructorId) {
+        const user = await prisma.user.findUnique({
+          where: { id: fitnessClass.instructorId },
           select: {
             id: true,
             name: true,
@@ -140,13 +129,7 @@ export const classRepository = {
       }
 
       const safeAvailable = Math.min(fitnessClass.capacity, Math.max(0, fitnessClass.availableSeats));
-      if (fitnessClass.availableSeats !== safeAvailable) {
-        await prisma.fitnessClass.update({
-          where: { id: fitnessClass.id },
-          data: { availableSeats: safeAvailable },
-        }).catch(() => {});
-        fitnessClass.availableSeats = safeAvailable;
-      }
+      fitnessClass.availableSeats = safeAvailable;
 
       return fitnessClass;
     });

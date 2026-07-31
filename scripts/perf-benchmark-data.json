@@ -3,8 +3,8 @@
     "actionName": "Member Login",
     "endpoint": "/api/auth/login",
     "method": "POST",
-    "ttfbMs": 1424.7,
-    "totalDurationMs": 1548.59,
+    "ttfbMs": 3873.27,
+    "totalDurationMs": 4210.08,
     "payloadSize": 251,
     "layeredBreakdown": {
       "middlewareMs": 2.1,
@@ -19,8 +19,8 @@
     "actionName": "Member Register",
     "endpoint": "/api/auth/register",
     "method": "POST",
-    "ttfbMs": 423.48,
-    "totalDurationMs": 460.3,
+    "ttfbMs": 670.46,
+    "totalDurationMs": 728.76,
     "payloadSize": 268,
     "layeredBreakdown": {
       "middlewareMs": 3.5,
@@ -35,8 +35,8 @@
     "actionName": "Get Available Classes",
     "endpoint": "/api/classes?location=Bangalore",
     "method": "GET",
-    "ttfbMs": 268.28,
-    "totalDurationMs": 291.61,
+    "ttfbMs": 178.8,
+    "totalDurationMs": 194.35,
     "payloadSize": 26,
     "layeredBreakdown": {
       "middlewareMs": 1.2,
@@ -51,8 +51,8 @@
     "actionName": "Book Class",
     "endpoint": "/api/bookings",
     "method": "POST",
-    "ttfbMs": 675.68,
-    "totalDurationMs": 734.43,
+    "ttfbMs": 850.5,
+    "totalDurationMs": 924.46,
     "payloadSize": 91,
     "layeredBreakdown": {
       "middlewareMs": 2.5,
@@ -67,8 +67,8 @@
     "actionName": "Get Active Bookings",
     "endpoint": "/api/bookings",
     "method": "GET",
-    "ttfbMs": 363.4,
-    "totalDurationMs": 395,
+    "ttfbMs": 160.41,
+    "totalDurationMs": 174.36,
     "payloadSize": 8990,
     "layeredBreakdown": {
       "middlewareMs": 1.5,
@@ -83,8 +83,8 @@
     "actionName": "Get Booking History",
     "endpoint": "/api/bookings/history?page=1&limit=20",
     "method": "GET",
-    "ttfbMs": 676.4,
-    "totalDurationMs": 735.22,
+    "ttfbMs": 527.27,
+    "totalDurationMs": 573.12,
     "payloadSize": 8449,
     "layeredBreakdown": {
       "middlewareMs": 1.8,
@@ -99,8 +99,8 @@
     "actionName": "Cancel Booking",
     "endpoint": "/api/bookings/cms7alc570003n098ir6ak7to/cancel",
     "method": "POST",
-    "ttfbMs": 33.09,
-    "totalDurationMs": 35.97,
+    "ttfbMs": 1529.42,
+    "totalDurationMs": 1662.41,
     "payloadSize": 16566,
     "layeredBreakdown": {
       "middlewareMs": 2.2,
@@ -115,9 +115,9 @@
     "actionName": "Admin Create Class",
     "endpoint": "/api/classes",
     "method": "POST",
-    "ttfbMs": 27.33,
-    "totalDurationMs": 29.71,
-    "payloadSize": 40,
+    "ttfbMs": 166.35,
+    "totalDurationMs": 180.82,
+    "payloadSize": 579,
     "layeredBreakdown": {
       "middlewareMs": 2,
       "controllerMs": 809.8,
@@ -125,6 +125,38 @@
       "repositoryMs": 806.4,
       "dbQueryCount": 1,
       "dbTotalMs": 800
+    }
+  },
+  {
+    "actionName": "Admin Edit Class",
+    "endpoint": "/api/classes/cms8pr19z0002jsumhr9v3de0",
+    "method": "PATCH",
+    "ttfbMs": 2118.35,
+    "totalDurationMs": 2302.55,
+    "payloadSize": 580,
+    "layeredBreakdown": {
+      "middlewareMs": 2.1,
+      "controllerMs": 683.5,
+      "serviceMs": 681.8,
+      "repositoryMs": 673.7,
+      "dbQueryCount": 3,
+      "dbTotalMs": 665
+    }
+  },
+  {
+    "actionName": "Admin Delete Class",
+    "endpoint": "/api/classes/cms8pr19z0002jsumhr9v3de0",
+    "method": "DELETE",
+    "ttfbMs": 1125.55,
+    "totalDurationMs": 1223.42,
+    "payloadSize": 134,
+    "layeredBreakdown": {
+      "middlewareMs": 2.3,
+      "controllerMs": 1937,
+      "serviceMs": 1935.5,
+      "repositoryMs": 1930.8,
+      "dbQueryCount": 3,
+      "dbTotalMs": 1920
     }
   }
 ]

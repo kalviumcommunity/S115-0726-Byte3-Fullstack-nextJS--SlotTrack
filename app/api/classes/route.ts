@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/lib/auth';
+import { getAuthenticatedUser } from '@/app/lib/auth-helper';
 import { classController } from '@/app/controllers/class.controller';
 
 export const dynamic = 'force-dynamic';
@@ -41,24 +40,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // 1. Authentication check
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
+    const authUser = await getAuthenticatedUser(request);
+    if (!authUser) {
       const error = new Error('Unauthorized') as Error & { status?: number };
       error.status = 401;
       throw error;
     }
 
-    const user = session.user as { id?: string; name?: string; role?: string };
-    const role = user.role || '';
     const body = await request.json();
 
     const payload = {
       ...body,
-      instructorId: user.id || body.instructorId,
-      instructor: body.instructor || user.name || 'Instructor',
+      instructorId: authUser.userId || body.instructorId,
+      instructor: body.instructor || 'Instructor',
     };
 
-    const result = await classController.createClass(payload, role);
+    const result = await classController.createClass(payload, authUser.role);
     return NextResponse.json(
       {
         success: true,
