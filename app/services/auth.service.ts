@@ -9,15 +9,6 @@ export const authService = {
       // 1. Validate request payload
       const validatedData = authValidator.validateRegister(data);
 
-      // 2. Check if email already exists
-      const existingUser = await authRepository.findByEmail(validatedData.email);
-      if (existingUser) {
-        const error = new Error('An account with this email address already exists') as Error & { status?: number };
-        error.status = 409;
-        throw error;
-      }
-
-      // 2.1. Check Employee ID validity for Instructors/Admins
       const rawRole = (data as any)?.role;
       const role = rawRole === 'ADMIN' || rawRole === 'admin' ? 'ADMIN' : 'MEMBER';
       const employeeId = (data as any)?.employeeId;
@@ -35,13 +26,24 @@ export const authService = {
           error.status = 400;
           throw error;
         }
+      }
 
-        const existingEmployee = await authRepository.findByEmployeeId(employeeId);
-        if (existingEmployee) {
-          const error = new Error('An account with this Employee ID already exists') as Error & { status?: number };
-          error.status = 409;
-          throw error;
-        }
+      // Parallelize email and employeeId checks
+      const [existingUser, existingEmployee] = await Promise.all([
+        authRepository.findByEmail(validatedData.email),
+        role === 'ADMIN' && employeeId ? authRepository.findByEmployeeId(employeeId) : Promise.resolve(null),
+      ]);
+
+      if (existingUser) {
+        const error = new Error('An account with this email address already exists') as Error & { status?: number };
+        error.status = 409;
+        throw error;
+      }
+
+      if (existingEmployee) {
+        const error = new Error('An account with this Employee ID already exists') as Error & { status?: number };
+        error.status = 409;
+        throw error;
       }
 
       // 3. Hash password using bcrypt

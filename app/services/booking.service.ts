@@ -7,30 +7,30 @@ export const bookingService = {
   // Implement booking creation
   async createBooking(userId: string, classId: string): Promise<any> {
     return measureSpan('SERVICE', 'bookingService.createBooking', async () => {
-      // 1. Check if the class exists
-      const fitnessClass = await bookingRepository.findClassById(classId);
+      // 1. Parallelize independent pre-transaction checks
+      const [fitnessClass, user, existingBooking] = await Promise.all([
+        bookingRepository.findClassById(classId),
+        bookingRepository.findUserById(userId),
+        bookingRepository.findUniqueBooking(userId, classId),
+      ]);
+
       if (!fitnessClass) {
         throw new NotFoundError(`Fitness class with ID ${classId} does not exist.`);
       }
 
-      // 2. Check if the user exists
-      const user = await bookingRepository.findUserById(userId);
       if (!user) {
         throw new NotFoundError(`User with ID ${userId} does not exist.`);
       }
 
-      // 3. Check if available seats are already 0
       if (fitnessClass.availableSeats <= 0) {
         throw new ConflictError("The selected class is already fully booked.");
       }
 
-      // 4. Check if duplicate active booking already exists
-      const existingBooking = await bookingRepository.findUniqueBooking(userId, classId);
       if (existingBooking && existingBooking.status === BookingStatus.ACTIVE) {
         throw new ConflictError("You have already booked a slot in this class.");
       }
 
-      // 5. Execute transaction to create booking and decrement seats
+      // 2. Execute transaction to create booking and decrement seats
       return bookingRepository.createBookingWithSeatDecrement(userId, classId, existingBooking);
     });
   },
