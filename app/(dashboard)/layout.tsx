@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/navigation/Navbar";
@@ -9,6 +9,7 @@ import { HistoryRow } from "../components/tables/HistoryTable";
 import { getBookings, bookClass, cancelBooking, getBookingHistory } from "@/app/lib/api/bookings";
 import { getProfile, updateProfile } from "@/app/lib/api/users";
 import { BookingType } from "@/app/types/booking";
+import { useToast } from "@/app/components/ui/Toast";
 
 // Define the dashboard state context
 interface DashboardContextType {
@@ -21,6 +22,9 @@ interface DashboardContextType {
   refreshData: () => Promise<void>;
   selectedLocation: string;
   setSelectedLocation: (loc: string) => void;
+  pendingMutations: Set<string>;
+  optimisticSeatDeltas: Record<string, number>;
+  getOptimisticAvailableSeats: (classId: string, baseAvailableSeats: number) => number;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -40,6 +44,7 @@ export default function DashboardLayout({
 }) {
   const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [bookings, setBookings] = useState<BookingType[]>([]);
@@ -49,6 +54,13 @@ export default function DashboardLayout({
   const [userAge, setUserAge] = useState<number | undefined>(undefined);
   const [userGender, setUserGender] = useState<string | undefined>(undefined);
   const [selectedLocation, setSelectedLocation] = useState("Pune");
+  const [pendingMutations, setPendingMutations] = useState<Set<string>>(new Set());
+  const [optimisticSeatDeltas, setOptimisticSeatDeltas] = useState<Record<string, number>>({});
+
+  const getOptimisticAvailableSeats = useCallback((classId: string, baseAvailableSeats: number) => {
+    const delta = optimisticSeatDeltas[classId] || 0;
+    return Math.max(0, baseAvailableSeats + delta);
+  }, [optimisticSeatDeltas]);
 
   const fetchUserProfile = async () => {
     try {
@@ -156,39 +168,120 @@ export default function DashboardLayout({
     const existingBooking = bookings.find(
       (b) => (b.classId === classIdOrBookingId || b.id === classIdOrBookingId) && b.status === "ACTIVE"
     );
-    if (existingBooking) {
+
+    const isBooked = !!existingBooking || bookedClassIds.includes(classIdOrBookingId);
+    const targetClassId = existingBooking ? existingBooking.classId : classIdOrBookingId;
+    const targetBookingId = existingBooking ? existingBooking.id : classIdOrBookingId;
+
+    // Prevent duplicate request while mutation is pending
+    if (pendingMutations.has(targetClassId) || pendingMutations.has(targetBookingId)) {
+      return;
+    }
+
+    setPendingMutations((prev) => {
+      const next = new Set(prev);
+      next.add(targetClassId);
+      next.add(targetBookingId);
+      return next;
+    });
+
+    // Save previous snapshot for rollback
+    const prevBookings = [...bookings];
+    const prevBookedClassIds = [...bookedClassIds];
+    const prevDeltas = { ...optimisticSeatDeltas };
+
+    if (isBooked) {
+      // --- OPTIMISTIC CANCEL ---
+      setBookedClassIds((prev) => prev.filter((id) => id !== targetClassId && id !== classIdOrBookingId));
+      setBookings((prev) => prev.filter((b) => b.classId !== targetClassId && b.id !== targetBookingId));
+      setOptimisticSeatDeltas((prev) => ({
+        ...prev,
+        [targetClassId]: (prev[targetClassId] || 0) + 1,
+      }));
+
       try {
-        await cancelBooking(existingBooking.id);
-        await fetchData(false);
+        await cancelBooking(targetBookingId);
+        const freshBookings = await getBookings();
+        setBookings(freshBookings);
+        setBookedClassIds(freshBookings.filter((b) => b.status === "ACTIVE").map((b) => b.classId));
+        setOptimisticSeatDeltas((prev) => {
+          const next = { ...prev };
+          delete next[targetClassId];
+          return next;
+        });
       } catch (err: any) {
-        try {
-          await cancelBooking(classIdOrBookingId);
-          await fetchData(false);
-        } catch (fallbackErr: any) {
-          alert(err?.message || fallbackErr?.message || "Failed to cancel booking");
-        }
+        // Rollback
+        setBookings(prevBookings);
+        setBookedClassIds(prevBookedClassIds);
+        setOptimisticSeatDeltas(prevDeltas);
+        toast.error(
+          "Cancellation failed",
+          err?.message || "The booking could not be cancelled. Please retry."
+        );
+      } finally {
+        setPendingMutations((prev) => {
+          const next = new Set(prev);
+          next.delete(targetClassId);
+          next.delete(targetBookingId);
+          return next;
+        });
       }
     } else {
-      const isAlreadyBooked = bookedClassIds.includes(classIdOrBookingId);
-      if (isAlreadyBooked) {
-        try {
-          await cancelBooking(classIdOrBookingId);
-          await fetchData(false);
-        } catch (err: any) {
-          alert(err?.message || "Failed to cancel booking");
+      const tempBookingId = `temp-booking-${targetClassId}-${Date.now()}`;
+      const tempBooking: any = {
+        id: tempBookingId,
+        userId: (session?.user as any)?.id || "temp-user",
+        classId: targetClassId,
+        status: "ACTIVE",
+        bookedAt: new Date(),
+        cancelledAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        class: {
+          id: targetClassId,
+          title: "Booked Class",
+          startTime: new Date().toISOString(),
+          endTime: new Date(Date.now() + 3600000).toISOString(),
+          location: "Location",
+          category: "Class",
+        },
+      };
+
+      setBookedClassIds((prev) => (prev.includes(targetClassId) ? prev : [...prev, targetClassId]));
+      setBookings((prev) => [tempBooking, ...prev]);
+      setOptimisticSeatDeltas((prev) => ({
+        ...prev,
+        [targetClassId]: (prev[targetClassId] || 0) - 1,
+      }));
+
+      try {
+        const result = await bookClass(targetClassId);
+        if (result?.booking) {
+          setBookings((prev) => prev.map((b) => (b.id === tempBookingId ? result.booking : b)));
         }
-      } else {
-        try {
-          await bookClass(classIdOrBookingId);
-          await fetchData(false);
-        } catch (err: any) {
-          try {
-            await cancelBooking(classIdOrBookingId);
-            await fetchData(false);
-          } catch (cancErr: any) {
-            alert(err?.message || "Failed to book class");
-          }
-        }
+        const freshBookings = await getBookings();
+        setBookings(freshBookings);
+        setBookedClassIds(freshBookings.filter((b) => b.status === "ACTIVE").map((b) => b.classId));
+        setOptimisticSeatDeltas((prev) => {
+          const next = { ...prev };
+          delete next[targetClassId];
+          return next;
+        });
+      } catch (err: any) {
+        // Rollback
+        setBookings(prevBookings);
+        setBookedClassIds(prevBookedClassIds);
+        setOptimisticSeatDeltas(prevDeltas);
+        toast.error(
+          "Booking failed",
+          err?.message || "Your booking could not be completed. Please try again."
+        );
+      } finally {
+        setPendingMutations((prev) => {
+          const next = new Set(prev);
+          next.delete(targetClassId);
+          return next;
+        });
       }
     }
   };
@@ -213,9 +306,9 @@ export default function DashboardLayout({
         });
       }
       
-      alert("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
     } catch (err: any) {
-      alert(err.message || "Failed to update profile");
+      toast.error("Profile update failed", err.message || "Failed to update profile");
     }
   };
 
@@ -248,6 +341,9 @@ export default function DashboardLayout({
         refreshData: fetchData,
         selectedLocation,
         setSelectedLocation,
+        pendingMutations,
+        optimisticSeatDeltas,
+        getOptimisticAvailableSeats,
       }}
     >
       <div className="min-h-screen bg-[#F8F8FA] flex flex-col font-sans antialiased text-[#111827]">
