@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, Calendar } from "lucide-react";
+import { User, Calendar, AlertCircle } from "lucide-react";
 
 export interface BookingWidgetProps {
   classId?: string;
@@ -11,6 +11,7 @@ export interface BookingWidgetProps {
   onBook?: (classId?: string) => Promise<void> | void;
   isBooked?: boolean;
   isLoading?: boolean;
+  isPast?: boolean;
 }
 
 export default function BookingWidget({
@@ -21,11 +22,13 @@ export default function BookingWidget({
   onBook,
   isBooked = false,
   isLoading = false,
+  isPast = false,
 }: BookingWidgetProps) {
   const [internalLoading, setInternalLoading] = useState(false);
 
   const handleBookClick = async () => {
     if (!onBook) return;
+    if (isPast && !isBooked) return;
     setInternalLoading(true);
     try {
       await onBook(classId);
@@ -37,6 +40,7 @@ export default function BookingWidget({
   };
 
   const activeLoading = isLoading || internalLoading;
+  const isBookingDisabled = (availableSeats <= 0 && !isBooked) || (isPast && !isBooked) || activeLoading;
 
   return (
     <div className="w-full rounded-[24px] border border-gray-200 bg-white p-6 shadow-[0px_8px_30px_rgba(0,0,0,0.04)] max-w-[310px] mx-auto md:mr-0 space-y-4">
@@ -69,14 +73,28 @@ export default function BookingWidget({
         </span>
       </div>
 
+      {/* Notice for past classes */}
+      {isPast && !isBooked && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-left">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs font-semibold text-amber-800 leading-snug">
+              This class has already started or has ended and you cannot book class for it now.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="space-y-3.5 pt-2">
         <button
           onClick={handleBookClick}
-          disabled={(availableSeats <= 0 && !isBooked) || activeLoading}
-          className={`w-full rounded-xl py-3 text-sm font-bold text-white transition-colors active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer flex items-center justify-center ${
+          disabled={isBookingDisabled}
+          className={`w-full rounded-xl py-3 text-sm font-bold text-white transition-colors active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center ${
             isBooked
               ? "bg-danger hover:bg-red-600 shadow-[0_2px_8px_rgba(239,68,68,0.12)] hover:shadow-[0_4px_12px_rgba(239,68,68,0.25)]"
+              : isPast
+              ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#72BF6A] hover:bg-[#5eaa57]"
           }`}
         >
@@ -88,7 +106,15 @@ export default function BookingWidget({
               </svg>
               Processing...
             </span>
-          ) : isBooked ? "Cancel Booking" : availableSeats <= 0 ? "Class Full" : "Book Now"}
+          ) : isBooked ? (
+            "Cancel Booking"
+          ) : isPast ? (
+            "Class Ended"
+          ) : availableSeats <= 0 ? (
+            "Class Full"
+          ) : (
+            "Book Now"
+          )}
         </button>
 
         <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-250 bg-white py-2.5 text-sm font-bold text-[#111827] shadow-[0px_2px_4px_rgba(0,0,0,0.01)] transition-colors hover:bg-gray-50 active:scale-[0.98] cursor-pointer">

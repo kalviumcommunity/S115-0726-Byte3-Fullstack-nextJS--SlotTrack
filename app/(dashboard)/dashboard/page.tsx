@@ -36,6 +36,7 @@ export default function UserDashboardPage() {
   const processedClasses: ClassCardProps[] = classes.map((cls) => {
     const start = new Date(cls.startTime);
     const end = new Date(cls.endTime);
+    const isPast = start.getTime() <= Date.now();
     
     const formattedDate = start.toLocaleDateString("en-IN", {
       day: "numeric",
@@ -64,6 +65,7 @@ export default function UserDashboardPage() {
       price: cls.price,
       isBooked: bookedClassIds.includes(cls.id),
       isPending: pendingMutations.has(cls.id),
+      isPast,
       availableSeats: getOptimisticAvailableSeats(cls.id, cls.availableSeats),
     };
   });

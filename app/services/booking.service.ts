@@ -22,6 +22,12 @@ export const bookingService = {
         throw new NotFoundError(`User with ID ${userId} does not exist.`);
       }
 
+      // 1b. Check if class has already started or ended
+      const classStartTime = new Date(fitnessClass.startTime).getTime();
+      if (classStartTime <= Date.now()) {
+        throw new ConflictError("This class has already started or has ended and you cannot book class for it now.");
+      }
+
       if (fitnessClass.availableSeats <= 0) {
         throw new ConflictError("The selected class is already fully booked.");
       }

@@ -153,17 +153,20 @@ export default function ScheduleSidebar({
 
                   {/* Items of the day */}
                   <div className="space-y-2">
-                    {group.items.map((booking) => (
-                      <ScheduleItem
-                        key={booking.classId || booking.id}
-                        id={booking.classId} // Pass classId for cancel action
-                        title={booking.class.title}
-                        time={formatTimeStr(booking.class.startTime, booking.class.endTime)}
-                        location={booking.class.location}
-                        status="booked"
-                        onCancel={onCancelBooking}
-                      />
-                    ))}
+                    {group.items.map((booking) => {
+                      const isPastClass = new Date(booking.class.startTime).getTime() < Date.now();
+                      return (
+                        <ScheduleItem
+                          key={booking.classId || booking.id}
+                          id={booking.classId} // Pass classId for cancel action
+                          title={booking.class.title}
+                          time={formatTimeStr(booking.class.startTime, booking.class.endTime)}
+                          location={booking.class.location}
+                          status="booked"
+                          onCancel={isPastClass ? undefined : onCancelBooking}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
               ))}
