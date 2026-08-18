@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { MapPin, ChevronDown } from "lucide-react";
+import { MapPin, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/app/lib/utils";
 import { useDashboard } from "../../(dashboard)/layout";
 
@@ -39,32 +39,47 @@ export default function LocationSelector() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-full hover:bg-bg-base transition-all duration-300 text-base font-bold text-text-primary border border-border bg-surface cursor-pointer select-none shadow-sm"
+        aria-label={`Select location, current location is ${selectedLocation}`}
+        aria-expanded={isOpen}
+        title={selectedLocation}
+        className="flex items-center justify-center gap-2 p-2 sm:px-5 sm:py-2.5 rounded-full hover:bg-bg-base transition-all duration-300 text-sm sm:text-base font-bold text-text-primary border border-border bg-surface cursor-pointer select-none shadow-sm"
       >
-        <MapPin className="size-5 text-primary" />
-        <span>{selectedLocation}</span>
+        <MapPin className="size-5 text-primary shrink-0" />
+        <span className="hidden sm:inline font-bold">{selectedLocation}</span>
         <ChevronDown
-          className={cn("size-4 text-text-secondary transition-transform duration-300", isOpen && "rotate-180")}
+          className={cn("hidden sm:block size-4 text-text-secondary transition-transform duration-300 shrink-0", isOpen && "rotate-180")}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-48 bg-surface rounded-input border border-border shadow-card z-30 overflow-hidden py-1 animate-fade-in font-sans font-semibold">
-          {LOCATIONS.map((loc) => (
-            <button
-              key={loc}
-              onClick={() => {
-                setSelectedLocation(loc);
-                setIsOpen(false);
-              }}
-              className={cn(
-                "w-full text-left px-4 py-2.5 text-sm hover:bg-bg-base transition-colors cursor-pointer",
-                selectedLocation === loc ? "text-primary bg-primary/5 font-extrabold" : "text-text-primary font-medium"
-              )}
-            >
-              {loc}
-            </button>
-          ))}
+        <div className="absolute right-0 sm:right-auto sm:left-1/2 sm:-translate-x-1/2 mt-2 w-48 sm:w-52 bg-surface rounded-2xl sm:rounded-input border border-border shadow-card z-50 overflow-hidden py-1 animate-fade-in font-sans font-semibold">
+          {/* Header on mobile showing active location context */}
+          <div className="px-3.5 py-2 border-b border-border text-xs font-bold text-text-secondary uppercase tracking-wider flex items-center justify-between sm:hidden">
+            <span>Location</span>
+            <span className="text-primary font-extrabold">{selectedLocation}</span>
+          </div>
+
+          <div className="max-h-60 overflow-y-auto scrollbar-thin">
+            {LOCATIONS.map((loc) => {
+              const isSelected = selectedLocation === loc;
+              return (
+                <button
+                  key={loc}
+                  onClick={() => {
+                    setSelectedLocation(loc);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    "w-full text-left px-3.5 py-2.5 text-sm flex items-center justify-between hover:bg-bg-base transition-colors cursor-pointer",
+                    isSelected ? "text-primary bg-primary/5 font-extrabold" : "text-text-primary font-medium"
+                  )}
+                >
+                  <span className="truncate">{loc}</span>
+                  {isSelected && <Check className="size-4 text-primary shrink-0 ml-2" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

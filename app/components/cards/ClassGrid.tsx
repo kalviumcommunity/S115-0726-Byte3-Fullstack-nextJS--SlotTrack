@@ -21,9 +21,11 @@ export default function ClassGrid({ classes, onBookToggle }: ClassGridProps) {
           time={cls.time}
           date={cls.date}
           location={cls.location}
+          detailedLocation={cls.detailedLocation}
           price={cls.price}
           isBooked={cls.isBooked}
           isPending={cls.isPending}
+          isPast={cls.isPast}
           onBookToggle={onBookToggle}
         />
       ))}

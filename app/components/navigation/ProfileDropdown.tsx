@@ -19,10 +19,11 @@ export default function ProfileDropdown({
   const displayRole = role === "ADMIN" ? "Instructor" : "Member";
 
   return (
-    <div className="relative">
+    <div className="relative shrink-0">
       <button
         onClick={onProfileClick}
-        className="flex items-center gap-3 text-left focus:outline-none cursor-pointer hover:bg-bg-base/50 p-2 rounded-input transition-colors duration-200"
+        aria-label="Open profile drawer"
+        className="flex items-center gap-2 sm:gap-3 text-left focus:outline-none cursor-pointer hover:bg-bg-base/50 p-1 sm:p-2 rounded-input transition-colors duration-200"
       >
         <Avatar
           src={avatarUrl}

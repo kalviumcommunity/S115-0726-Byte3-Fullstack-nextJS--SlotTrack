@@ -1,7 +1,7 @@
 "use client";
 
 import React, { use, useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import BookingDetails from "@/app/components/booking/BookingDetails";
 import BookingWidget from "@/app/components/booking/BookingWidget";
 import AboutClass from "@/app/components/booking/AboutClass";
@@ -9,6 +9,7 @@ import ContactCard from "@/app/components/booking/ContactCard";
 import { useDashboard } from "@/app/(dashboard)/layout";
 import { getClassById } from "@/app/lib/api/classes";
 import { FitnessClassType } from "@/app/types/fitness-class";
+import { useToast } from "@/app/components/ui/Toast";
 import Link from "next/link";
 
 interface PageProps {
@@ -18,6 +19,7 @@ interface PageProps {
 export default function DynamicBookingPage({ params }: PageProps) {
   const { id } = use(params);
   const { bookedClassIds, toggleBookClass, getOptimisticAvailableSeats, pendingMutations } = useDashboard();
+  const { toast } = useToast();
   const [currentClass, setCurrentClass] = useState<FitnessClassType | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -64,6 +66,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
 
   const start = new Date(currentClass.startTime);
   const end = new Date(currentClass.endTime);
+  const isPast = start.getTime() <= Date.now();
 
   const formattedDate = start.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -96,6 +99,13 @@ export default function DynamicBookingPage({ params }: PageProps) {
 
   const handleBookingAction = async () => {
     if (!currentClass) return;
+    if (isPast && !isCurrentlyBooked) {
+      toast.error(
+        "Booking unavailable",
+        "This class has already started or has ended and you cannot book class for it now."
+      );
+      return;
+    }
     await toggleBookClass(currentClass.id);
     try {
       const updatedClass = await getClassById(id);
@@ -124,6 +134,19 @@ export default function DynamicBookingPage({ params }: PageProps) {
           Booking details
         </h1>
       </div>
+
+      {/* Past Class Alert Banner */}
+      {isPast && !isCurrentlyBooked && (
+        <div className="mb-8 flex items-start sm:items-center gap-3.5 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5 text-amber-900 shadow-sm animate-fade-in">
+          <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+          <div className="space-y-0.5">
+            <h4 className="text-sm font-bold text-amber-900">Booking Unavailable</h4>
+            <p className="text-sm text-amber-800 font-medium">
+              This class has already started or has ended and you cannot book class for it now.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Main Details and Booking Widget Card */}
       <div className="rounded-[24px] border border-border bg-white p-6 md:p-8 shadow-card mb-8">
@@ -154,6 +177,7 @@ export default function DynamicBookingPage({ params }: PageProps) {
               onBook={handleBookingAction}
               isBooked={isCurrentlyBooked}
               isLoading={isPending}
+              isPast={isPast}
             />
           </div>
         </div>

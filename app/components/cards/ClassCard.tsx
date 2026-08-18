@@ -18,6 +18,7 @@ export interface ClassCardProps {
   price: number;
   isBooked?: boolean;
   isPending?: boolean;
+  isPast?: boolean;
   onBookToggle?: (id: string) => void;
 }
 
@@ -33,6 +34,7 @@ export default function ClassCard({
   price,
   isBooked = false,
   isPending = false,
+  isPast = false,
   onBookToggle,
 }: ClassCardProps) {
   const router = useRouter();
@@ -41,10 +43,14 @@ export default function ClassCard({
     router.push(`/booking/${id}`);
   };
 
+  const isButtonDisabled = isPending || (isPast && !isBooked);
+
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white border border-[#EEF2F6] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-6px] transition-all duration-500 group flex flex-col h-full cursor-pointer"
+      className={`bg-white border border-[#EEF2F6] rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] hover:translate-y-[-6px] transition-all duration-500 group flex flex-col h-full cursor-pointer ${
+        isPast && !isBooked ? "opacity-85" : ""
+      }`}
     >
       {/* Cover Image & Category Badge */}
       <div className="relative h-48 md:h-[220px] w-full overflow-hidden">
@@ -60,6 +66,11 @@ export default function ClassCard({
           <Badge className="bg-white/95 text-[#111827] shadow-sm backdrop-blur-xs">
             {category}
           </Badge>
+          {isPast && !isBooked && (
+            <Badge className="bg-gray-900/80 text-white shadow-sm backdrop-blur-xs">
+              Ended
+            </Badge>
+          )}
           {isPending && (
             <Badge className="bg-blue-500/90 text-white shadow-sm backdrop-blur-xs animate-pulse">
               Syncing...
@@ -110,18 +121,24 @@ export default function ClassCard({
         {/* Action Button */}
         <div className="w-full mt-2">
           <Button
-            variant={isBooked ? "danger" : "primary"}
+            variant={isBooked ? "danger" : isPast ? "secondary" : "primary"}
             className="w-full text-base font-bold py-3 disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={isPending}
+            disabled={isButtonDisabled}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (onBookToggle && !isPending) {
+              if (onBookToggle && !isButtonDisabled) {
                 onBookToggle(id);
               }
             }}
           >
-            {isPending ? "Syncing..." : isBooked ? "Cancel Booking" : "Book Now"}
+            {isPending
+              ? "Syncing..."
+              : isBooked
+              ? "Cancel Booking"
+              : isPast
+              ? "Class Ended"
+              : "Book Now"}
           </Button>
         </div>
       </div>
